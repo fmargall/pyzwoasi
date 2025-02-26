@@ -114,6 +114,8 @@ def getCameraProperty(cameraIndex):
     """
     @brief Gets information about the camera
 
+    @note Can be done without opening the camera
+
     @param cameraIndex Index of the camera, 0 being the first
 
     @return Information about the camera, with type CameraInfo
@@ -130,6 +132,8 @@ lib.ASIGetCameraPropertyByID.argtypes = [ctypes.c_int, ctypes.POINTER(CameraInfo
 def getCameraPropertyByID(cameraID):
     """
     @brief Gets information about the camera
+
+    @note Camera needs to be open first
 
     @param cameraID ID of the camera
 
@@ -199,9 +203,9 @@ def getNumOfControls(cameraID):
     errorCode = lib.ASIGetNumOfControls(cameraID, pNumOfControls)
     if errorCode != 0:
         raise ValueError(f"Failed to get number of controls for cameraID {cameraID}. Error code: {errorCode}")
-    if pNumOfControls < 0:
+    if pNumOfControls.value < 0:
         raise ValueError(f"Number of controls of cameraID {cameraID} cannot be negative ({pNumOfControls})")
-    return pNumOfControls
+    return pNumOfControls.value
 
 # Defining ASI_ERROR_CODE ASIGetControlCaps(int iCameraID, int iControlIndex, ASI_CONTROL_CAPS * pControlCaps)
 lib.ASIGetControlCaps.restype = ctypes.c_int
@@ -213,7 +217,7 @@ def getControlCaps(cameraID, controlIndex):
     @param cameraID     can be obtained using getCameraProperty
     @param controlIndex index of control, NOT control type
 
-    @return structure containing the property of the control
+    @return Structure containing the property of the control
     """
     controlCaps = ControlCaps()
     errorCode = lib.ASIGetControlCaps(cameraID, controlIndex, controlCaps)
@@ -221,63 +225,267 @@ def getControlCaps(cameraID, controlIndex):
         raise ValueError(f"Failed to get number of controls for cameraID {cameraID}. Error code: {errorCode}")
     return controlCaps
 
-# Defining ASI_ERROR_CODE ASIGetControlValue(int  iCameraID, ASI_CONTROL_TYPE  ControlType, long *plValue, ASI_BOOL *pbAuto)
+# Defining ASI_ERROR_CODE ASIGetControlValue(int iCameraID, ASI_CONTROL_TYPE ControlType, long *plValue, ASI_BOOL *pbAuto)
 lib.ASIGetControlValue.restype = ctypes.c_int
 lib.ASIGetControlValue.argtypes = [ctypes.c_int, ctypes.c_int, ctypes.POINTER(ctypes.c_long), ctypes.POINTER(ctypes.c_int)]
-def getControlValue(cameraID, controlType, auto):
+def getControlValue(cameraID, controlType):
     """
-    """
+    @brief Gets the value of a specific control of the camera
 
-# Defining ASI_ERROR_CODE ASISetControlValue(int  iCameraID, ASI_CONTROL_TYPE  ControlType, long lValue, ASI_BOOL bAuto)
+    @param cameraID    ID of the camera
+    @param controlType Type of the control to get the value of
+
+    @return Tuple containing value of the control 
+                             auto status
+    """
+    value      = ctypes.c_long()
+    autoStatus = ctypes.c_int()
+    errorCode = lib.ASIGetControlValue(cameraID, controlType, ctypes.byref(value), ctypes.byref(autoStatus))
+    if errorCode != 0:
+        raise ValueError(f"Failed to get control value for cameraID {cameraID}. Error code: {errorCode}")
+    return value.value, autoStatus.value == 1
+
+# Defining ASI_ERROR_CODE ASISetControlValue(int iCameraID, ASI_CONTROL_TYPE  ControlType, long lValue, ASI_BOOL bAuto)
 lib.ASISetControlValue.restype = ctypes.c_int
 lib.ASISetControlValue.argtypes = [ctypes.c_int, ctypes.c_int, ctypes.c_long, ctypes.c_int]
 def setControlValue(cameraID, controlType, value, auto):
     """
+    @brief Sets the value of a specific control of the camera
+
+    @note It will clamp the value to the minimum or the maximum if it is out of range
+
+    @param cameraID    ID of the camera
+    @param controlType Type of the control to set the value of
+    @param value       Value to set for the control
+    @param auto        Boolean indicating if the control should be set to auto
     """
+    errorCode = lib.ASISetControlValue(cameraID, controlType, value, auto)
+    if errorCode != 0:
+        raise ValueError(f"Failed to set control value for cameraID {cameraID}. Error code: {errorCode}")
 
-# Defining ASI_ERROR_CODE ASIGetROIFormat(int iCameraID, int *piWidth, int *piHeight,  int *piBin, ASI_IMG_TYPE *pImg_type)
+# Defining ASI_ERROR_CODE ASIGetROIFormat(int iCameraID, int *piWidth, int *piHeight, int *piBin, ASI_IMG_TYPE *pImg_type)
+lib.ASIGetROIFormat.restype = ctypes.c_int
+lib.ASIGetROIFormat.argtypes = [ctypes.c_int, ctypes.POINTER(ctypes.c_int), ctypes.POINTER(ctypes.c_int), ctypes.POINTER(ctypes.c_int), ctypes.POINTER(ctypes.c_int)]
+def getROIFormat(cameraID):
+    """
+    @brief Gets the current ROI format settings of the camera
 
-# Defining ASI_ERROR_CODE ASISetROIFormat(int iCameraID, int iWidth, int iHeight,  int iBin, ASI_IMG_TYPE Img_type)
+    @note Capture must be stopped before calling it
+
+    @param cameraID ID of the camera
+
+    @return Tuple containing width
+                             height
+                             binning
+                             image type
+    """
+    width   = ctypes.c_int()
+    height  = ctypes.c_int()
+    binning = ctypes.c_int()
+    imgType = ctypes.c_int()
+    errorCode = lib.ASIGetROIFormat(cameraID, ctypes.byref(width), ctypes.byref(height), ctypes.byref(binning), ctypes.byref(imgType))
+    if errorCode != 0:
+        raise ValueError(f"Failed to get ROI format for cameraID {cameraID}. Error code: {errorCode}")
+    return width.value, height.value, binning.value, imgType.value
+
+# Defining ASI_ERROR_CODE ASISetROIFormat(int iCameraID, int iWidth, int iHeight, int iBin, ASI_IMG_TYPE Img_type)
+lib.ASISetROIFormat.restype = ctypes.c_int
+lib.ASISetROIFormat.argtypes = [ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_int]
+def setROIFormat(cameraID, width, height, binning, imgType):
+    """
+    @brief Sets the ROI format settings of the camera before capture
+
+    @note Capture must be stopped before calling it
+
+    @param cameraID ID of the camera
+    @param width    Width of the ROI area. Make sure width % 8 == 0 
+    @param height   Height of the ROI area. Make sure height % 2 == 0
+                    Further, for USB2.0 camera ASI120, make sure that width * height % 1024 == 0 
+    @param binning  Binning method (1 or 2)
+    @param imgType  Output format (0: RAW8, 1: RGB24, 2: RAW16, 3: Y8, -1: IMG_END)
+    """
+    errorCode = lib.ASISetROIFormat(cameraID, width, height, binning, imgType)
+    if errorCode != 0:
+        raise ValueError(f"Failed to set ROI format for cameraID {cameraID}. Error code: {errorCode}")
 
 # Defining ASI_ERROR_CODE ASIGetStartPos(int iCameraID, int *piStartX, int *piStartY)
+lib.ASIGetStartPos.restype = ctypes.c_int
+lib.ASIGetStartPos.argtypes = [ctypes.c_int, ctypes.POINTER(ctypes.c_int), ctypes.POINTER(ctypes.c_int)]
+def getStartPos(cameraID):
+    """
+    @brief Gets the start position of the current ROI area
+
+    @param cameraID ID of the camera
+
+    @return Tuple containing startX
+                             startY
+    """
+    startX = ctypes.c_int()
+    startY = ctypes.c_int()
+    errorCode = lib.ASIGetStartPos(cameraID, ctypes.byref(startX), ctypes.byref(startY))
+    if errorCode != 0:
+        raise ValueError(f"Failed to get start position for cameraID {cameraID}. Error code: {errorCode}")
+    return startX.value, startY.value
 
 # Defining ASI_ERROR_CODE ASISetStartPos(int iCameraID, int iStartX, int iStartY)
+lib.ASISetStartPos.restype = ctypes.c_int
+lib.ASISetStartPos.argtypes = [ctypes.c_int, ctypes.c_int, ctypes.c_int]
+def setStartPos(cameraID, startX, startY):
+    """
+    @brief Sets the start position of the ROI area
+
+    @param cameraID ID of the camera
+    @param startX   Start X position
+    @param startY   Start Y position
+    """
+    errorCode = lib.ASISetStartPos(cameraID, startX, startY)
+    if errorCode != 0:
+        raise ValueError(f"Failed to set start position for cameraID {cameraID}. Error code: {errorCode}")
 
 # Defining ASI_ERROR_CODE ASIGetDroppedFrames(int iCameraID,int *piDropFrames)
+lib.ASIGetDroppedFrames.restype = ctypes.c_int
+lib.ASIGetDroppedFrames.argtypes = [ctypes.c_int, ctypes.POINTER(ctypes.c_int)]
+def getDroppedFrames(cameraID):
+    """
+    @brief Gets the number of dropped frames
+
+    @notes Drop frames happen when USB is traffic or harddisk write speed is slow
+           it will reset to 0 after stop capture
+
+    @param cameraID ID of the camera
+
+    @return Number of dropped frames
+    """
+    droppedFrames = ctypes.c_int()
+    errorCode = lib.ASIGetDroppedFrames(cameraID, ctypes.byref(droppedFrames))
+    if errorCode != 0:
+        raise ValueError(f"Failed to get dropped frames for cameraID {cameraID}. Error code: {errorCode}")
+    return droppedFrames.value
 
 # Defining ASI_ERROR_CODE ASIEnableDarkSubtract(int iCameraID, char *pcBMPPath)
+lib.ASIEnableDarkSubtract.restype = ctypes.c_int
+# ================= TO BE DONE =================
 
 # Defining ASI_ERROR_CODE ASIDisableDarkSubtract(int iCameraID)
+lib.ASIDisableDarkSubtract.restype = ctypes.c_int
+lib.ASIDisableDarkSubtract.argtypes = [ctypes.c_int]
+def disableDarkSubtract(cameraID):
+    """
+    @brief Disables the dark subtract function
+
+    @notes Should be called at start if no dark function is used,
+           because the function is remembered on Windows platform
+
+    @param cameraID ID of the camera
+    """
+    errorCode = lib.ASIDisableDarkSubtract(cameraID)
+    if errorCode != 0:
+        raise ValueError(f"Failed to disable dark subtract for cameraID {cameraID}. Error code: {errorCode}")
 
 # Defining ASI_ERROR_CODE ASIStartVideoCapture(int iCameraID)
+lib.ASIStartVideoCapture.restype = ctypes.c_int
+lib.ASIStartVideoCapture.argtypes = [ctypes.c_int]
+def startVideoCapture(cameraID):
+    """
+    @brief Starts video capture
+
+    @param cameraID ID of the camera
+    """
+    errorCode = lib.ASIStartVideoCapture(cameraID)
+    if errorCode != 0:
+        raise ValueError(f"Failed to start video capture for cameraID {cameraID}. Error code: {errorCode}")
 
 # Defining ASI_ERROR_CODE ASIStopVideoCapture(int iCameraID)
+lib.ASIStopVideoCapture.restype = ctypes.c_int
+lib.ASIStopVideoCapture.argtypes = [ctypes.c_int]
+def stopVideoCapture(cameraID):
+    """
+    @brief Stops video capture
+
+    @param cameraID ID of the camera
+    """
+    errorCode = lib.ASIStopVideoCapture(cameraID)
+    if errorCode != 0:
+        raise ValueError(f"Failed to stop video capture for cameraID {cameraID}. Error code: {errorCode}")
 
 # Defining ASI_ERROR_CODE ASIGetVideoData(int iCameraID, unsigned char* pBuffer, long lBuffSize, int iWaitms)
+lib.ASIGetVideoData.restype = ctypes.c_int
+lib.ASIGetVideoData.argtypes = [ctypes.c_int, ctypes.POINTER(ctypes.c_ubyte), ctypes.c_long, ctypes.c_int]
+def getVideoData(cameraID, bufferSize, waitms):
+    """
+    @brief Gets video data from the camera buffer
+
+    @note This API should be called as fast as possible, the buffer being
+          very small, otherwiste frame will be discarded. The best method
+          is to maintain one buffer loop and call this API in a different
+          thread.
+          Make sure that the buffer size is big enough to hold one image,
+          otherwiste this API will crash.
+
+    @param cameraID   ID of the camera
+    @param bufferSize Buffer to store the video data. Its size, in bytes:
+                      8bit mono : width * height
+                      16bit mono: width * height * 2
+                      RGB24     : width * height * 3
+    @param waitms     Time to wait for the data in milliseconds, -1 for
+                      infinite.  Recommended value is set to exposure *
+                      2 + 500 ms
+
+    @return Buffer containing the video data
+    """
+    buffer = (ctypes.c_ubyte * bufferSize)()
+    errorCode = lib.ASIGetVideoData(cameraID, buffer, bufferSize, waitms)
+    if errorCode != 0:
+        raise ValueError(f"Failed to get video data for cameraID {cameraID}. Error code: {errorCode}")
+    return bytes(buffer)
 
 # Defining ASI_ERROR_CODE ASIGetVideoDataGPS(int iCameraID, unsigned char* pBuffer, long lBuffSize, int iWaitms, ASI_GPS_DATA *gpsData)
+lib.ASIGetVideoDataGPS.restype = ctypes.c_int
+# =============== TO BE DONE ===============
 
 # Defining ASI_ERROR_CODE ASIPulseGuideOn(int iCameraID, ASI_GUIDE_DIRECTION direction)
+lib.ASIPulseGuideOn.restype = ctypes.c_int
+# ============== TO BE DONE ==============
 
 # Defining ASI_ERROR_CODE ASIPulseGuideOff(int iCameraID, ASI_GUIDE_DIRECTION direction)
+lib.ASIPulseGuideOff.restype = ctypes.c_int
+# ============== TO BE DONE ==============
 
 # Defining ASI_ERROR_CODE ASIStartExposure(int iCameraID, ASI_BOOL bIsDark)
+lib.ASIStartExposure.restype = ctypes.c_int
+# ============== TO BE DONE ==============
 
 # Defining ASI_ERROR_CODE ASIStopExposure(int iCameraID)
+lib.ASIStopExposure.restype = ctypes.c_int
+# ============== TO BE DONE ==============
 
 # Defining ASI_ERROR_CODE ASIGetExpStatus(int iCameraID, ASI_EXPOSURE_STATUS *pExpStatus)
+lib.ASIGetExpStatus.restype = ctypes.c_int
+# ============== TO BE DONE ==============
 
 # Defining ASI_ERROR_CODE ASIGetDataAfterExp(int iCameraID, unsigned char* pBuffer, long lBuffSize)
+lib.ASIGetDataAfterExp.restype = ctypes.c_int
+# ================ TO BE DONE ================
 
 # Defining ASI_ERROR_CODE ASIGetDataAfterExpGPS(int iCameraID, unsigned char* pBuffer, long lBuffSize, ASI_GPS_DATA *gpsData)
+lib.ASIGetDataAfterExpGPS.restype = ctypes.c_int
+# ================= TO BE DONE =================
 
 # Defining ASI_ERROR_CODE ASIGetID(int iCameraID, ASI_ID* pID)
+lib.ASIGetID.restype = ctypes.c_int
+# =========== TO BE DONE ===========
 
 # Defining ASI_ERROR_CODE ASISetID(int iCameraID, ASI_ID ID)
+lib.ASISetID.restype = ctypes.c_int
+# =========== TO BE DONE ===========
 
 # Defining ASI_ERROR_CODE ASIGetGainOffset(int iCameraID, int *pOffset_HighestDR, int *pOffset_UnityGain, int *pGain_LowestRN, int *pOffset_LowestRN)
+lib.ASIGetGainOffset.restype = ctypes.c_int
+# ============== TO BE DONE ==============
 
 # Defining ASI_ERROR_CODE ASIGetLMHGainOffset(int iCameraID, int* pLGain, int* pMGain, int* pHGain, int* pHOffset)
+lib.ASIGetLMHGainOffset.restype = ctypes.c_int
+# ================ TO BE DONE ================
 
 # Defining char* ASIGetSDKVersion()
 lib.ASIGetSDKVersion.restype = ctypes.c_char_p
@@ -292,12 +500,20 @@ def getSDKVersion():
 
 
 # Defining ASI_ERROR_CODE ASIGetCameraSupportMode(int iCameraID, ASI_SUPPORTED_MODE* pSupportedMode)
+lib.ASIGetCameraSupportMode.restype = ctypes.c_int
+# ================== TO BE DONE ==================
 
 # Defining ASI_ERROR_CODE ASIGetCameraMode(int iCameraID, ASI_CAMERA_MODE* mode)
+lib.ASIGetCameraMode.restype = ctypes.c_int
+# =============== TO BE DONE ===============
 
 # Defining ASI_ERROR_CODE ASISetCameraMode(int iCameraID, ASI_CAMERA_MODE mode)
+lib.ASISetCameraMode.restype = ctypes.c_int
+# =============== TO BE DONE ===============
 
-# Defining ASISendSoftTrigger(int iCameraID, ASI_BOOL bStart)
+# Defining ASI_ERROR_CODE ASISendSoftTrigger(int iCameraID, ASI_BOOL bStart)
+lib.ASISendSoftTrigger.restype = ctypes.c_int
+# ================ TO BE DONE ================
 
 # Defining ASIGetSerialNumber(int iCameraID, ASI_SN* pSN)
 lib.ASIGetSerialNumber.argtypes = [ctypes.c_int, ctypes.POINTER(SN)]
@@ -319,7 +535,13 @@ def getSerialNumber(cameraID):
     return ''.join(f"{b:02X}" for b in serialNumber.SN)
 
 # Defining ASI_ERROR_CODE ASISetTriggerOutputIOConf(int iCameraID, ASI_TRIG_OUTPUT_PIN pin, ASI_BOOL bPinHigh, long lDelay, long lDuration)
+lib.ASISetTriggerOutputIOConf.restype = ctypes.c_int
+# =================== TO BE DONE ===================
 
 # Defining ASI_ERROR_CODE ASIGetTriggerOutputIOConf(int iCameraID, ASI_TRIG_OUTPUT_PIN pin, ASI_BOOL *bPinHigh, long *lDelay, long *lDuration)
+lib.ASIGetTriggerOutputIOConf.restype = ctypes.c_int
+# =================== TO BE DONE ===================
 
 # Defining ASI_ERROR_CODE ASIGPSGetData(int iCameraID, ASI_GPS_DATA* startLineGPSData, ASI_GPS_DATA* endLineGPSData)
+lib.ASIGPSGetData.restype = ctypes.c_int
+# ============= TO BE DONE =============

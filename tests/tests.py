@@ -1,7 +1,7 @@
-import unittest
+import ctypes, unittest
 
 from src.main import CameraInfo, ControlCaps
-from src.main import cameraCheck, closeCamera, getCameraProperty, getCameraPropertyByID, getControlCaps, getNumOfConnectedCameras, getNumOfControls, getProductIDs, getSDKVersion, getSerialNumber, initCamera, openCamera
+from src.main import cameraCheck, closeCamera, disableDarkSubtract, getCameraProperty, getCameraPropertyByID, getControlCaps, getControlValue, getDroppedFrames, getNumOfConnectedCameras, getNumOfControls, getProductIDs, getROIFormat, getSDKVersion, getSerialNumber, getStartPos, getVideoData, initCamera, openCamera, setControlValue, setROIFormat, setStartPos, startVideoCapture, stopVideoCapture
 
 class TestASICamera2(unittest.TestCase):
         def test_getNumOfConnectedCameras(self):
@@ -35,8 +35,8 @@ class TestASICamera2(unittest.TestCase):
                 self.assertIsInstance(cameraInfo.MaxWidth            , int)
                 self.assertIsInstance(cameraInfo.IsColorCam          , int)
                 self.assertIsInstance(cameraInfo.BayerPattern        , int)
-                self.assertIsInstance(cameraInfo.SupportedBins       , (list, tuple))
-                self.assertIsInstance(cameraInfo.SupportedVideoFormat, (list, tuple))
+                self.assertIsInstance(cameraInfo.SupportedBins       , ctypes.Array)
+                self.assertIsInstance(cameraInfo.SupportedVideoFormat, ctypes.Array)
                 self.assertIsInstance(cameraInfo.PixelSize           , float)
                 self.assertIsInstance(cameraInfo.MechanicalShutter   , int)
                 self.assertIsInstance(cameraInfo.ST4Port             , int)
@@ -49,28 +49,35 @@ class TestASICamera2(unittest.TestCase):
                 self.assertIsInstance(cameraInfo.Unused              , bytes)
 
         def test_getCameraPropertyByID(self):
-            productIDs = getProductIDs()
-            for productID in productIDs:
-                cameraInfo = getCameraPropertyByID(productID)
-                self.assertIsInstance(cameraInfo                     , CameraInfo)
-                self.assertIsInstance(cameraInfo.Name                , bytes)
-                self.assertIsInstance(cameraInfo.CameraID            , int)
-                self.assertIsInstance(cameraInfo.MaxHeight           , int)
-                self.assertIsInstance(cameraInfo.MaxWidth            , int)
-                self.assertIsInstance(cameraInfo.IsColorCam          , int)
-                self.assertIsInstance(cameraInfo.BayerPattern        , int)
-                self.assertIsInstance(cameraInfo.SupportedBins       , (list, tuple))
-                self.assertIsInstance(cameraInfo.SupportedVideoFormat, (list, tuple))
-                self.assertIsInstance(cameraInfo.PixelSize           , float)
-                self.assertIsInstance(cameraInfo.MechanicalShutter   , int)
-                self.assertIsInstance(cameraInfo.ST4Port             , int)
-                self.assertIsInstance(cameraInfo.IsCoolerCam         , int)
-                self.assertIsInstance(cameraInfo.IsUSB3Host          , int)
-                self.assertIsInstance(cameraInfo.IsUSB3Camera        , int)
-                self.assertIsInstance(cameraInfo.ElecPerADU          , float)
-                self.assertIsInstance(cameraInfo.BitDepth            , int)
-                self.assertIsInstance(cameraInfo.IsTriggerCam        , int)
-                self.assertIsInstance(cameraInfo.Unused             , bytes)
+            numCameras = getNumOfConnectedCameras()
+            for i in range(numCameras):
+                try:
+                    cameraInfo = getCameraProperty(i)
+                    openCamera(cameraInfo.CameraID) # Camera must be opened to call by ID
+                    cameraInfo = getCameraPropertyByID(cameraInfo.CameraID)
+                    self.assertIsInstance(cameraInfo                     , CameraInfo)
+                    self.assertIsInstance(cameraInfo.Name                , bytes)
+                    self.assertIsInstance(cameraInfo.CameraID            , int)
+                    self.assertIsInstance(cameraInfo.MaxHeight           , int)
+                    self.assertIsInstance(cameraInfo.MaxWidth            , int)
+                    self.assertIsInstance(cameraInfo.IsColorCam          , int)
+                    self.assertIsInstance(cameraInfo.BayerPattern        , int)
+                    self.assertIsInstance(cameraInfo.SupportedBins       , ctypes.Array)
+                    self.assertIsInstance(cameraInfo.SupportedVideoFormat, ctypes.Array)
+                    self.assertIsInstance(cameraInfo.PixelSize           , float)
+                    self.assertIsInstance(cameraInfo.MechanicalShutter   , int)
+                    self.assertIsInstance(cameraInfo.ST4Port             , int)
+                    self.assertIsInstance(cameraInfo.IsCoolerCam         , int)
+                    self.assertIsInstance(cameraInfo.IsUSB3Host          , int)
+                    self.assertIsInstance(cameraInfo.IsUSB3Camera        , int)
+                    self.assertIsInstance(cameraInfo.ElecPerADU          , float)
+                    self.assertIsInstance(cameraInfo.BitDepth            , int)
+                    self.assertIsInstance(cameraInfo.IsTriggerCam        , int)
+                    self.assertIsInstance(cameraInfo.Unused             , bytes)
+                except ValueError as e:
+                    self.fail(f"getCameraPropertyByID raised error unexpectedly: {e}")
+                finally:
+                    closeCamera(cameraInfo.CameraID)
 
         def test_openCamera(self):
             numCameras = getNumOfConnectedCameras()
@@ -80,6 +87,8 @@ class TestASICamera2(unittest.TestCase):
                     openCamera(cameraInfo.CameraID)
                 except ValueError as e:
                     self.fail(f"openCamera raised error unexpectedly: {e}")
+                finally:
+                    closeCamera(cameraInfo.CameraID)
 
         def test_initCamera(self):
             numCameras = getNumOfConnectedCameras()
@@ -90,6 +99,8 @@ class TestASICamera2(unittest.TestCase):
                     initCamera(cameraInfo.CameraID)
                 except ValueError as e:
                     self.fail(f"initCamera raised error unexpectedly: {e}")
+                finally:
+                    closeCamera(cameraInfo.CameraID)
 
         def test_closeCamera(self):
             numCameras = getNumOfConnectedCameras()
@@ -108,11 +119,13 @@ class TestASICamera2(unittest.TestCase):
                 cameraInfo = getCameraProperty(i)
                 try:
                     openCamera(cameraInfo.CameraID)
-                    numOfControls = getNumOfControls(cameraInfo.cameraID)
+                    numOfControls = getNumOfControls(cameraInfo.CameraID)
                     self.assertIsInstance(numOfControls, int)
                     self.assertGreaterEqual(numOfControls, 0)
                 except ValueError as e:
                     self.fail(f"getNumOfControls raised error unexpectedly: {e}")
+                finally:
+                    closeCamera(cameraInfo.CameraID)
 
         def test_getControlCaps(self):
             numCameras = getNumOfConnectedCameras()
@@ -125,6 +138,8 @@ class TestASICamera2(unittest.TestCase):
                         self.assertIsInstance(controlCaps, ControlCaps)
                 except ValueError as e:
                     self.fail(f"getControlCaps raised error unexpectedly: {e}")
+                finally:
+                    closeCamera(cameraInfo.CameraID)
 
         def test_getSDKVersion(self):
             sdkVersion = getSDKVersion()
@@ -143,7 +158,248 @@ class TestASICamera2(unittest.TestCase):
                     self.assertRegex(serialNumber, r'^[0-9A-F]{16}$')
                 except ValueError as e:
                     self.fail(f"getSerialNumber raised error unexpectedly: {e}")
+                finally:
+                    closeCamera(cameraInfo.CameraID)
 
+        def test_getControlValue(self):
+            numCameras = getNumOfConnectedCameras()
+            for i in range(numCameras):
+                cameraInfo = getCameraProperty(i)
+                try:
+                    openCamera(cameraInfo.CameraID)
+                    initCamera(cameraInfo.CameraID)
+                    numOfControls = getNumOfControls(cameraInfo.CameraID)
+                    for controlIndex in range(numOfControls):
+                        controlCaps = getControlCaps(cameraInfo.CameraID, controlIndex)
+                        controlType = controlCaps.ControlType
+                        value, auto = getControlValue(cameraInfo.CameraID, controlType)
+                        self.assertIsInstance(value, int)
+                        self.assertIsInstance(auto, bool)
+                except ValueError as e:
+                    self.fail(f"getControlValue raised error unexpectedly: {e}")
+                finally:
+                    closeCamera(cameraInfo.CameraID)
+
+        def test_setControlValue(self):
+            numCameras = getNumOfConnectedCameras()
+            for i in range(numCameras):
+                cameraInfo = getCameraProperty(i)
+                try:
+                    openCamera(cameraInfo.CameraID)
+                    initCamera(cameraInfo.CameraID)
+                    numOfControls = getNumOfControls(cameraInfo.CameraID)
+                    for controlIndex in range(numOfControls):
+                        controlCaps = getControlCaps(cameraInfo.CameraID, controlIndex)
+                        
+                        if controlCaps.IsWritable: # Testing only for writable controls
+                            controlType = controlCaps.ControlType
+                            originalValue, originalAuto = getControlValue(cameraInfo.CameraID, controlType)
+                            newValue = int((originalValue + controlCaps.MaxValue) / 2)
+                            setControlValue(cameraInfo.CameraID, controlType, newValue, originalAuto)
+                            value, auto = getControlValue(cameraInfo.CameraID, controlType)
+                            self.assertEqual(value, newValue)
+                            self.assertEqual(auto, originalAuto)
+                            # Reset to original value
+                            setControlValue(cameraInfo.CameraID, controlType, originalValue, originalAuto)
+
+                except ValueError as e:
+                    self.fail(f"setControlValue raised error unexpectedly: {e}")
+                finally:
+                    closeCamera(cameraInfo.CameraID)
+
+        def test_getROIFormat(self):
+            numCameras = getNumOfConnectedCameras()
+            for i in range(numCameras):
+                cameraInfo = getCameraProperty(i)
+                try:
+                    openCamera(cameraInfo.CameraID)
+                    initCamera(cameraInfo.CameraID)
+                    width, height, binning, imgType = getROIFormat(cameraInfo.CameraID)
+                    self.assertIsInstance(width, int)
+                    self.assertGreaterEqual(width, 0)
+                    self.assertIsInstance(height, int)
+                    self.assertGreaterEqual(height, 0)
+                    self.assertIsInstance(binning, int)
+                    self.assertIn(binning, [1, 2])
+                    self.assertIsInstance(imgType, int)
+                    self.assertGreaterEqual(imgType, -1)
+                    self.assertLessEqual(imgType, 3)
+                except ValueError as e:
+                    self.fail(f"getROIFormat raised error unexpectedly: {e}")
+                finally:
+                    closeCamera(cameraInfo.CameraID)
+        
+        def test_setROIFormat(self):
+            numCameras = getNumOfConnectedCameras()
+            for i in range(numCameras):
+                cameraInfo = getCameraProperty(i)
+                try:
+                    openCamera(cameraInfo.CameraID)
+                    initCamera(cameraInfo.CameraID)
+                    originalWidth, originalHeight, originalBinning, originalImgType = getROIFormat(cameraInfo.CameraID)
+                    
+                    # Test setting new ROI format
+                    newWidth   = 640 if originalWidth   >= 640 else originalWidth
+                    newHeight  = 480 if originalHeight  >= 480 else originalHeight
+                    newBinning = 1   if originalBinning == 2   else 2
+                    newImgType = 0   if originalImgType != 0   else 1
+                    
+                    setROIFormat(cameraInfo.CameraID, newWidth, newHeight, newBinning, newImgType)
+                    width, height, binning, imgType = getROIFormat(cameraInfo.CameraID)
+                    
+                    self.assertEqual(width, newWidth)
+                    self.assertEqual(height, newHeight)
+                    self.assertEqual(binning, newBinning)
+                    self.assertEqual(imgType, newImgType)
+                    
+                    # Reset to original ROI format
+                    setROIFormat(cameraInfo.CameraID, originalWidth, originalHeight, originalBinning, originalImgType)
+                except ValueError as e:
+                    self.fail(f"setROIFormat raised error unexpectedly: {e}")
+                finally:
+                    closeCamera(cameraInfo.CameraID)
+
+        def test_getStartPos(self):
+            numCameras = getNumOfConnectedCameras()
+            for i in range(numCameras):
+                cameraInfo = getCameraProperty(i)
+                try:
+                    openCamera(cameraInfo.CameraID)
+                    initCamera(cameraInfo.CameraID)
+                    startX, startY = getStartPos(cameraInfo.CameraID)
+                    self.assertIsInstance(startX, int)
+                    self.assertIsInstance(startY, int)
+                    self.assertGreaterEqual(startX, 0)
+                    self.assertGreaterEqual(startY, 0)
+                except ValueError as e:
+                    self.fail(f"getStartPos raised error unexpectedly: {e}")
+                finally:
+                    closeCamera(cameraInfo.CameraID)
+        
+        def test_setStartPos(self):
+            numCameras = getNumOfConnectedCameras()
+            for i in range(numCameras):
+                cameraInfo = getCameraProperty(i)
+                try:
+                    openCamera(cameraInfo.CameraID)
+                    initCamera(cameraInfo.CameraID)
+                    originalStartX, originalStartY = getStartPos(cameraInfo.CameraID)
+                    width, height, binning, imgType = getROIFormat(cameraInfo.CameraID)
+                    
+                    # Test setting new start position
+                    newStartX = 0
+                    newStartY = 0
+
+                    # We should avoid to be out of bounds
+                    if (originalStartX == newStartX) and (originalStartY == newStartY):
+                        newStartX = int((originalStartX + cameraInfo.MaxWidth - width) / 2)
+                        newStartY = int((originalStartY + cameraInfo.MaxHeight - height) / 2)
+                    else:
+                        continue
+
+                    setStartPos(cameraInfo.CameraID, newStartX, newStartY)
+                    startX, startY = getStartPos(cameraInfo.CameraID)
+                    
+                    self.assertEqual(startX, newStartX)
+                    self.assertEqual(startY, newStartY)
+                    
+                    # Reset to original start position
+                    setStartPos(cameraInfo.CameraID, originalStartX, originalStartY)
+                except ValueError as e:
+                    self.fail(f"setStartPos raised error unexpectedly: {e}")
+                finally:
+                    closeCamera(cameraInfo.CameraID)
+
+        def test_getDroppedFrames(self):
+            numCameras = getNumOfConnectedCameras()
+            for i in range(numCameras):
+                cameraInfo = getCameraProperty(i)
+                try:
+                    openCamera(cameraInfo.CameraID)
+                    initCamera(cameraInfo.CameraID)
+                    droppedFrames = getDroppedFrames(cameraInfo.CameraID)
+                    self.assertIsInstance(droppedFrames, int)
+                    self.assertGreaterEqual(droppedFrames, 0)
+                except ValueError as e:
+                    self.fail(f"getDroppedFrames raised error unexpectedly: {e}")
+                finally:
+                    closeCamera(cameraInfo.CameraID)
+
+        def test_disableDarkSubstract(self):
+            numCameras = getNumOfConnectedCameras()
+            for i in range(numCameras):
+                cameraInfo = getCameraProperty(i)
+                try:
+                    openCamera(cameraInfo.CameraID)
+                    initCamera(cameraInfo.CameraID)
+                    disableDarkSubtract(cameraInfo.CameraID)
+                except ValueError as e:
+                    self.fail(f"disableDarkSubtract raised error unexpectedly: {e}")
+                finally:
+                    closeCamera(cameraInfo.CameraID)
+
+        def test_startVideoCapture(self):
+            numCameras = getNumOfConnectedCameras()
+            for i in range(numCameras):
+                cameraInfo = getCameraProperty(i)
+                try:
+                    openCamera(cameraInfo.CameraID)
+                    initCamera(cameraInfo.CameraID)
+                    startVideoCapture(cameraInfo.CameraID)
+                except ValueError as e:
+                    self.fail(f"startVideoCapture raised error unexpectedly: {e}")
+                finally:
+                    closeCamera(cameraInfo.CameraID)
+
+        def test_stopVideoCapture(self):
+            numCameras = getNumOfConnectedCameras()
+            for i in range(numCameras):
+                cameraInfo = getCameraProperty(i)
+                try:
+                    openCamera(cameraInfo.CameraID)
+                    initCamera(cameraInfo.CameraID)
+                    startVideoCapture(cameraInfo.CameraID)
+                    stopVideoCapture(cameraInfo.CameraID)
+                except ValueError as e:
+                    self.fail(f"stopVideoCapture raised error unexpectedly: {e}")
+                finally:
+                    closeCamera(cameraInfo.CameraID)
+
+        def test_getVideoData(self):
+            numCameras = getNumOfConnectedCameras()
+            for i in range(numCameras):
+                cameraInfo = getCameraProperty(i)
+                try:
+                    openCamera(cameraInfo.CameraID)
+                    initCamera(cameraInfo.CameraID)
+                    startVideoCapture(cameraInfo.CameraID)
+            
+                    width, height, binning, imgType = getROIFormat(cameraInfo.CameraID)
+                    bufferSize = width * height * 3 # Assuming RGB24 format for testing
+            
+                    maxAttempts = 1000 # Avoiding endless loop
+                    for attempt in range(maxAttempts):
+                        try:
+                            # Multiple attempts are needed to get the video data
+                            buffer = getVideoData(cameraInfo.CameraID, bufferSize, 1)
+                            self.assertIsInstance(buffer, bytes)
+                            self.assertEqual(len(buffer), bufferSize)
+                            break # Exiting the loop if successful
+                        except ValueError as e:
+                            if attempt >= maxAttempts:
+                                self.fail(f"getVideoData raised error after {maxAttempts} attempts: {e}")
+                            else:
+                                # Retrying
+                                continue
+            
+                    self.assertIsInstance(buffer, bytes)
+                    self.assertEqual(len(buffer), bufferSize)
+            
+                except ValueError as e:
+                    self.fail(f"getVideoData raised error unexpectedly: {e}")
+                finally:
+                    stopVideoCapture(cameraInfo.CameraID)
+                    closeCamera(cameraInfo.CameraID)
 
 if __name__ == '__main__':
     unittest.main()
