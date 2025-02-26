@@ -1,0 +1,6 @@
+[project]
+name = "pyzwoasi"
+version = "0.0.1"
+authors = [
+  { name="François Margall", email="francois.margall@inria.fr" },
+]
