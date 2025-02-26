@@ -1,0 +1,2 @@
+include src/lib/x86/ASICamera2.dll
+include src/lib/x64/ASICamera2.dll

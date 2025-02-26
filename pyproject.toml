@@ -1,6 +1,22 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "pyzwoasi"
-version = "0.0.1"
+version = "0.1.0-prealpha"
+description = "Python binding for the ZWO ASI SDK library"
 authors = [
-  { name="François Margall", email="francois.margall@inria.fr" },
+	{ name = "François Margall", email = "fr.margall@proton.me" },
 ]
+readme = "README.md"
+keywords = ["binding", "zwo", "asi", "sdk", "wrapper", "camera", "astronomy"]
+classifiers = [
+	Private :: Do Not Upload,
+	Development Status :: 3 - Alpha,
+	License :: OSI Approved :: MIT License,
+	Operating System :: Microsoft :: Windows,
+]
+
+[project.urls]
+Repository = "https://github.com/fmargall/pyzwoasi.git"

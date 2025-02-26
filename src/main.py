@@ -1,6 +1,12 @@
 import ctypes
+import platform
+import os
 
-lib = ctypes.cdll.LoadLibrary("./lib/x64/ASICamera2.dll")
+
+# Chosing and reading correct dll
+arch = platform.architecture()[0]
+dllPath = os.path.join(os.path.dirname(__file__), 'lib', 'x64' if arch == '64bit' else 'x86', 'ASICamera2.dll')
+lib = ctypes.cdll.LoadLibrary(dllPath)
 
 
 # Defining struct _ASI_CAMERA_INFO
@@ -42,12 +48,17 @@ class ControlCaps(ctypes.Structure):
         ("Unused"         , ctypes.c_char * 32)
     ]
 
+# Defining ASI_ID typedef
+class ID(ctypes.Structure):
+    _fields_ = [
+        ("ID", ctypes.c_ubyte * 8) # 8-byte array
+    ]
+
 # Defining ASI_SN typedef
 class SN(ctypes.Structure):
     _fields_ = [
         ("SN", ctypes.c_ubyte * 8) # 8-byte array
     ]
-
 
 # Defining int ASIGetNumOfConnectedCameras()
 lib.ASIGetNumOfConnectedCameras.restype = ctypes.c_int
@@ -473,11 +484,13 @@ lib.ASIGetDataAfterExpGPS.restype = ctypes.c_int
 
 # Defining ASI_ERROR_CODE ASIGetID(int iCameraID, ASI_ID* pID)
 lib.ASIGetID.restype = ctypes.c_int
-# =========== TO BE DONE ===========
+lib.ASIGetID.argtypes = [ctypes.c_int, ctypes.POINTER(ID)]
+# ====================== TO BE DONE ======================
 
 # Defining ASI_ERROR_CODE ASISetID(int iCameraID, ASI_ID ID)
 lib.ASISetID.restype = ctypes.c_int
-# =========== TO BE DONE ===========
+lib.ASISetID.argtypes = [ctypes.c_int, ID]
+# ============== TO BE DONE ==============
 
 # Defining ASI_ERROR_CODE ASIGetGainOffset(int iCameraID, int *pOffset_HighestDR, int *pOffset_UnityGain, int *pGain_LowestRN, int *pOffset_LowestRN)
 lib.ASIGetGainOffset.restype = ctypes.c_int
