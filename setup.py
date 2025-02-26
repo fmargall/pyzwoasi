@@ -13,16 +13,16 @@ def getDataFiles():
 
 setup(
     name='pyzwoasi',
-    version='0.1.0-prealpha',
+    version='0.1.0-alpha',
     packages=find_packages(where='src'),
     package_dir={'': 'src'},
-    data_files=get_data_files(),
+    data_files=getDataFiles(),
     include_package_data=True,
     install_requires=[],
     classifiers=[
-        'Private :: Do Not Upload',
 	    'Development Status :: 3 - Alpha',
 	    'License :: OSI Approved :: MIT License',
 	    'Operating System :: Microsoft :: Windows',
     ],
+    long_description=open('README.md', encoding='utf-8').read(),
 )
