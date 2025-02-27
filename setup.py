@@ -14,8 +14,7 @@ def getDataFiles():
 setup(
     name='pyzwoasi',
     version='0.1.0-alpha',
-    packages=find_packages(where='src'),
-    package_dir={'': 'src'},
+    packages=find_packages(),
     data_files=getDataFiles(),
     include_package_data=True,
     install_requires=[],
