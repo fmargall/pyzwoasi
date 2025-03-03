@@ -1,7 +1,7 @@
 # PyZWOASI
 
 <p align="center">
- [![Supported ASI SDK version : 1.37](https://img.shields.io/badge/Supported_ASI_SDK_Version-1.37-blue)](https://www.zwoastro.com/software/)
+ [![Supported ASI SDK version : 1.37](https://img.shields.io/badge/Supported_ASI_SDK_Version-1.37-blue/)](https://www.zwoastro.com/software/)
 </p>
 
 PyZWOASI is a Python binding for the ZWO ASI SDK. No other Python packages or dependencies are required. 
@@ -19,4 +19,4 @@ The installer will takes in charge the machine configuration and chooses the rig
 
 ## Contact
 
-François Margall - fr.margall@proton.me
+FranÃ§ois Margall - fr.margall@proton.me
