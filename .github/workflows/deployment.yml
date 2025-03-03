@@ -1,4 +1,4 @@
-name: Deployment workflow to test-PyPI
+name: Deployment workflow to PyPI
 
 on:
   push:
@@ -6,7 +6,37 @@ on:
       - master
 
 jobs:
+  update-version:
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extracting version from tag
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+
+      - name: Updating setup.py
+        run: |
+          sed -i "s/version=['\"]*[0-9.]*['\"]/version='${VERSION}'/" setup.py
+
+      - name: Updating pyproject.toml
+        run: |
+          sed -i "s/^version = \".*\"/version = \"${VERSION}\"/" pyproject.toml
+
+      - name: Commit modifications
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git add setup.py pyproject.toml
+          git commit -m "Mise à jour de la version vers ${VERSION}"
+          git push origin main
+
   build:
+    needs:
+      - update-version # To ensure that update-version job is executed first
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
@@ -33,14 +63,15 @@ jobs:
         name: python-package-distributions
         path: dist/
 
-  publish:
+  publish-to-pypi:
+    if: startsWith(github.ref, 'refs/tags/')
     needs:
     - build
     runs-on: ubuntu-latest
     
     environment:
-      name: testpypi
-      url: https://test.pypi.org/p/pyzwoasi
+      name: testpypi # Should be testpypi for testing
+      url: https://test.pypi.org/p/pyzwoasi # Should be test.pypi.org for testing
 
     permissions:
       id-token: write
@@ -52,7 +83,76 @@ jobs:
         name: python-package-distributions
         path: dist/
 
-    - name: Publish distribution to Test-PyPI
+    - name: Publish distribution to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
       with:
-        repository-url: https://test.pypi.org/legacy/
+        repository-url: https://test.pypi.org/legacy/ # test.pypi.org for testing
+
+  github-release:
+    name: >-
+      Sign the Python distribution with Sigstore
+      and upload them to GitHub Release
+    needs:
+    - publish-to-pypi
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      id-token: write
+
+    steps:
+    - name: Download all the dists
+      uses: actions/download-artifact@v4
+      with:
+        name: python-package-distributions
+        path: dist/
+    - name: Sign the dists with Sigstore
+      uses: sigstore/gh-action-sigstore-python@v3.0.0
+      with:
+        inputs: >-
+          ./dist/*.tar.gz
+          ./dist/*.whl
+    
+    - name: Determines if prerelease
+      id: prerelease
+      run: >-
+        # Checks if we are talking about a pre-release or not
+        if [[ "$GITHUB_REF_NAME" =~ ^v?[0-9]+\.[0-9]+\.[0-9]+[a-zA-Z].* || "$GITHUB_REF_NAME" =~ ^[^v].* ]]; then
+          echo "PRERELEASE=true" >> $GITHUB_ENV
+        else
+          echo "PRERELEASE=false" >> $GITHUB_ENV
+        fi
+
+    - name: Extract version from tag
+      run: echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_ENV
+    
+    - name: Defining (pre)release name
+      run: >-
+        RELEASE_NAME="PyZWOASI ${{ env.VERSION }}"
+          
+    - name: Create GitHub Release
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      run: >-
+        # This is a pre-release
+        if [ "${{ env.PRERELEASE }}" = "true" ]; then
+          gh release create
+          "$GITHUB_REF_NAME"
+          --repo "$GITHUB_REPOSITORY"
+          --title "$RELEASE_NAME"
+          --notes "" --prerelease
+        # This is a stable release
+        else
+          gh release create
+          "$GITHUB_REF_NAME"
+          --repo "$GITHUB_REPOSITORY"
+          --title "$RELEASE_NAME"
+          --notes ""
+        fi
+    - name: Upload artifact signatures to GitHub Release
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      run: >-
+        gh release upload
+        "$GITHUB_REF_NAME" dist/**
+        --repo "$GITHUB_REPOSITORY"
