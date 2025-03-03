@@ -40,7 +40,7 @@ jobs:
           git config --global user.email "github-actions@github.com"
           git add setup.py pyproject.toml
           git commit -m "Updating version to ${VERSION}"
-          git push origin main
+          git push origin master
 
   build:
     needs:
