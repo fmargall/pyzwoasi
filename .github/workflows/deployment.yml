@@ -16,9 +16,15 @@ jobs:
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0  # Takes all Git history
 
       - name: Extracting version from tag
         run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+
+      - name: Switch to main branch
+         run: |
+           git checkout main
+           git pull origin main  # Updates branch before pushing
 
       - name: Updating setup.py
         run: |
@@ -33,7 +39,7 @@ jobs:
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
           git add setup.py pyproject.toml
-          git commit -m "Mise à jour de la version vers ${VERSION}"
+          git commit -m "Updating version to ${VERSION}"
           git push origin main
 
   build:
