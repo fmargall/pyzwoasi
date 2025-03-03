@@ -21,10 +21,10 @@ jobs:
       - name: Extracting version from tag
         run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
 
-      - name: Switch to main branch
+      - name: Switch to master branch
         run: |
-          git checkout main
-          git pull origin main  # Updates branch before pushing
+          git checkout master
+          git pull origin master  # Updates branch before pushing
 
       - name: Updating setup.py
         run: |
