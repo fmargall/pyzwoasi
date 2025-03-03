@@ -13,7 +13,7 @@ def getDataFiles():
 
 setup(
     name='pyzwoasi',
-    version='0.1.0-alpha.1',
+    version='0.1.0-alpha.8'0.1.0-alpha.1',
     packages=find_packages(),
     data_files=getDataFiles(),
     include_package_data=True,
