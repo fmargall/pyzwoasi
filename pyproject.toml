@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pyzwoasi"
-version = "0.1.0-alpha1"
+version = "0.1.0-alpha.1"
 description = "Python binding for the ZWO ASI SDK library"
 authors = [
 	{ name = "Francois Margall", email = "fr.margall@proton.me" },
