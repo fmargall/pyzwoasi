@@ -51,4 +51,4 @@ jobs:
         TWINE_USERNAME: __token__
         TWINE_PASSWORD: ${{ secrets.TEST_PYPI_PASSWORD }}
       run: |
-        python -m twine upload dist/*
+        python -m twine upload testpypi dist/*
