@@ -22,9 +22,9 @@ jobs:
         run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
 
       - name: Switch to main branch
-         run: |
-           git checkout main
-           git pull origin main  # Updates branch before pushing
+        run: |
+          git checkout main
+          git pull origin main  # Updates branch before pushing
 
       - name: Updating setup.py
         run: |
