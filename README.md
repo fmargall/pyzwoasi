@@ -38,6 +38,8 @@ The installer will take in charge the machine configuration and choose the right
 - [ ] Add more precise error handling
 - [ ] Add missing functions from the ZWO ASI SDK
 
+If you have any wishes, suggestions, comments or advice, please feel free to [create an issue](https://github.com/fmargall/pyzwoasi/issues) or contact me directly.
+
 ## License
 Distributed under the MIT License. See `LICENSE.txt` for more information.
 
