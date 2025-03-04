@@ -23,6 +23,7 @@ The installer will takes in charge the machine configuration and chooses the rig
 - [ ] Add Linux support
 - [ ] Add Android support
 - [ ] Add more precise error handling
+- [ ] Add missing functions from the ZWO ASI SDK
 
 ## License
 Distributed under the MIT License. See `LICENSE.txt` for more information.
