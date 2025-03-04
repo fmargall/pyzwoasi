@@ -1,10 +1,10 @@
 [build-system]
-requires = ["setuptools"]
+requires = ["setuptools >= 64", "setuptools-scm >= 8"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "pyzwoasi"
-version = "0.1.0-alpha.1"
+dynamic = ["version"]
 description = "Python binding for the ZWO ASI SDK library"
 authors = [
 	{ name = "Francois Margall", email = "fr.margall@proton.me" },
@@ -19,3 +19,6 @@ classifiers = [
 
 [project.urls]
 Repository = "https://github.com/fmargall/pyzwoasi.git"
+
+[tool.setuptools.dynamic]
+version = {attr = "pyzwoasi.__version__"}

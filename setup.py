@@ -1,9 +1,14 @@
-import os, platform
+import os, platform, re
 
 from setuptools import setup, find_packages
 
 
-def getDataFiles():
+
+def getVersion():
+    with open(os.path.join("pyzwoasi", "__version__.py")) as f:
+        return re.search(r'__version__ = "(.*?)"', f.read()).group(1)
+
+def getDllFiles():
     arch = platform.architecture()[0]
     if arch == '64bit':
         dllPath = 'pyzwoasi/lib/x64/ASICamera2.dll'
@@ -13,9 +18,9 @@ def getDataFiles():
 
 setup(
     name='pyzwoasi',
-    version='0.1.0-alpha.1',
+    version=getVersion(),
     packages=find_packages(),
-    data_files=getDataFiles(),
+    data_files=getDllFiles(),
     include_package_data=True,
     install_requires=[],
     classifiers=[

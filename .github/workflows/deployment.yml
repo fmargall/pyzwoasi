@@ -8,43 +8,7 @@ on:
       - '*'
 
 jobs:
-  update-version:
-    if: startsWith(github.ref, 'refs/tags/')
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          fetch-depth: 0  # Takes all Git history
-
-      - name: Extracting version from tag
-        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
-
-      - name: Switch to master branch
-        run: |
-          git checkout master
-          git pull origin master  # Updates branch before pushing
-
-      - name: Updating setup.py
-        run: |
-          sed -i "s/version=['\"]*[0-9.]*['\"]/version='${VERSION}'/" setup.py
-
-      - name: Updating pyproject.toml
-        run: |
-          sed -i "s/^version = \".*\"/version = \"${VERSION}\"/" pyproject.toml
-
-      - name: Commit modifications
-        run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "github-actions@github.com"
-          git add setup.py pyproject.toml
-          git commit -m "Updating version to ${VERSION}"
-          git push origin master
-
   build:
-    needs:
-      - update-version # To ensure that update-version job is executed first
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
@@ -60,7 +24,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install build
+        pip install build setuptools_scm
 
     - name: Build package
       run: python -m build
