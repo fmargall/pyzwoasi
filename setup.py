@@ -5,9 +5,8 @@ from setuptools import setup, find_packages
 
 def getVersion():
     versionNs = {}
-    with open(os.path.join("pyzwoasi", "__version__.py")) as f:
-        exec(f.read(), versionNs)
-        return versionNs["__version__"]
+    with open("pyzwoasi/__version__.py") as f:
+        return re.search(r'__version__ = "(.*?)"', f.read()).group(1)
 
 
 def getDllFiles():
@@ -21,6 +20,8 @@ def getDllFiles():
 
 setup(
     name='pyzwoasi',
+    #use_scm_version=True,
+    #setup_requires=['setuptools_scm'],
     version=getVersion(),
     packages=find_packages(),
     data_files=getDllFiles(),

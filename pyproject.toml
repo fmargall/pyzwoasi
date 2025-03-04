@@ -20,5 +20,9 @@ classifiers = [
 [project.urls]
 Repository = "https://github.com/fmargall/pyzwoasi.git"
 
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["pyzwoasi*"]
+
 [tool.setuptools.dynamic]
 version = {attr = "pyzwoasi.__version__"}
