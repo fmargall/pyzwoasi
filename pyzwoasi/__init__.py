@@ -19,7 +19,7 @@ from.pyzwoasi import (
     getStartPos,
     setStartPos,
     getDroppedFrames,
-    disableDarkSubstract,
+    disableDarkSubtract,
     startVideoCapture,
     stopVideoCapture,
     getVideoData,
