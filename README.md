@@ -19,6 +19,8 @@ python -m pip install pyzwoasi
 
 The installer will takes in charge the machine configuration and chooses the right compiled library file from ZWO.
 
-## Contact
+## License
+Distributed under the MIT License. See `LICENSE.txt` for more information.
 
+## Contact
 François Margall - fr.margall@proton.me
