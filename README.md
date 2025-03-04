@@ -1,9 +1,16 @@
-# PyZWOASI
+# PyZWOASI &middot; <img src="https://github.com/fmargall/pyzwoasi/actions/workflows/deployment.yml/badge.svg" alt="Build status"> <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="MIT License">
+
+PyZWOASI is a Python binding for the ZWO ASI SDK. It is developped to be easy-to-use and functional, and, if I can make it, up-to-date.
 
 <p align="center">
   <a href="https://www.zwoastro.com/software/">
     <img src="https://img.shields.io/badge/Supported_ASI_SDK_Version-1.37-blue" alt="Supported ASI SDK version : 1.37">
-  </a> <br>
+  </a>
+</p>
+
+Currently compatible with Windows, Linux and MacOS.
+
+<p align="center">
   <a href="https://www.microsoft.com/windows/">
     <img src="https://img.shields.io/badge/Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white" alt="Windows compatible">
   </a> 
@@ -16,8 +23,6 @@
     <img src="https://img.shields.io/badge/MacOS-000000?style=for-the-badge&logo=apple&logoColor=white" alt="MacOS compatible">
   </a>
 </p>
-
-PyZWOASI is a Python binding for the ZWO ASI SDK. No other Python packages or dependencies are required. Windows and Linux compatible.
 
 ## Installation
 
@@ -44,6 +49,21 @@ The installer will take in charge the machine configuration and choose the right
 - [ ] Add missing functions from the ZWO ASI SDK
 
 If you have any wishes, suggestions, comments or advice, please feel free to [create an issue](https://github.com/fmargall/pyzwoasi/issues) or contact me directly.
+
+### Code quality
+
+This Python project will also be a test of different codings metrics and tools to ensure its quality and security. This part is more a personal challenge and journey into new metrics and Python tools.
+
+- [ ] Computing code coverage using `coverage`
+- [ ] Static code analysis using `pylint`
+- [ ] Style guide enforcement using `black` or `flake8`
+- [ ] Writing a Git best practices charter for the project (atomic commits and explicits like `feat:`, `fix:`, `refactor:` and so on)
+- [ ] Writing a security charter, using `bandit` and `safety` to ensure the code is secure
+- [ ] Making large documentation using `sphinx`, `readthedocs` and proposing metrics with `docstr-coverage`
+- [ ] Profiling the code with `cProfile` and `line_profiler`
+- [ ] Various other code metrics with `radon` and `mccabe`
+- [ ] Adding build status badges and SonarQube badges
+- [ ] and lots of other things proposed by [other repos](https://github.com/dwyl/repo-badges)
 
 ## License
 Distributed under the MIT License. See `LICENSE.txt` for more information.
