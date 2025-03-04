@@ -106,15 +106,15 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ github.token }}
       run: |
-        # This is a pre-release
         if [ "${{ env.PRERELEASE }}" = "true" ]; then
+          # This is a pre-release
           gh release create \
           "$GITHUB_REF_NAME" \
           --repo "$GITHUB_REPOSITORY" \
           --title "$RELEASE_NAME" \
           --notes "" --prerelease
-        # This is a stable release
         else
+          # This is a stable release
           gh release create \
           "$GITHUB_REF_NAME" \
           --repo "$GITHUB_REPOSITORY" \
