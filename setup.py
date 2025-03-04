@@ -22,6 +22,8 @@ def getDllFiles():
             dllPath = 'pyzwoasi/lib/Linux/x64/libASICamera2.so.1.37'
         else:
             dllPath = 'pyzwoasi/lib/Linux/x86/libASICamera2.so.1.37'
+    elif system == 'Darwin':
+        dllPath = 'pyzwoasi/lib/MacOS/libASICamera2.dylib.1.37'
     else:
         raise ValueError(f"Unsupported system: {system}")
 
@@ -41,6 +43,8 @@ setup(
 	    'Development Status :: 3 - Alpha',
 	    'License :: OSI Approved :: MIT License',
 	    'Operating System :: Microsoft :: Windows',
+        "Operating System :: POSIX :: Linux",
+	    "Operating System :: MacOS :: MacOS X",
     ],
     long_description=open('README.md', encoding='utf-8').read(),
 )

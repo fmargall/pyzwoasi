@@ -1,4 +1,5 @@
 include src/lib/Windows/x86/ASICamera2.dll
 include src/lib/Windows/x64/ASICamera2.dll
-include src/lib/Linux/x86/libASICamera2.a
-include src/lib/Linux/x64/libASICamera2.a
+include src/lib/Linux/x86/libASICamera2.so.1.37
+include src/lib/Linux/x64/libASICamera2.so.1.37
+include src/lib/MacOS/libASICamera2.dylib.1.37

@@ -6,7 +6,14 @@ import os
 # Chosing and reading correct dll
 system = platform.system()
 arch = platform.architecture()[0]
-dllPath = os.path.join(os.path.dirname(__file__), 'lib', system, 'x64' if arch == '64bit' else 'x86', 'ASICamera2.dll' if system == 'Windows' else 'libASICamera2.so.1.37')
+if system == 'Windows':
+    dllPath = os.path.join(os.path.dirname(__file__), 'lib', system, 'x64' if arch == '64bit' else 'x86', 'ASICamera2.dll')
+elif system == 'Linux':
+    dllPath = os.path.join(os.path.dirname(__file__), 'lib', system, 'x64' if arch == '64bit' else 'x86', 'libASICamera2.so.1.37')
+elif system == 'Darwin':
+    dllPath = os.path.join(os.path.dirname(__file__), 'lib', 'MacOS', 'libASICamera2.dylib.1.37')
+else:
+    raise ValueError(f"Unsupported system: {system}")
 lib = ctypes.cdll.LoadLibrary(dllPath)
 
 

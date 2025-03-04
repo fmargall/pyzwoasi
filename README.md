@@ -11,6 +11,10 @@
   <a href="https://www.kernel.org/">
     <img src="https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black" alt="Linux compatible">
   </a>
+  &ensp;
+  <a href="https://www.apple.com/macos/">
+    <img src="https://img.shields.io/badge/MacOS-000000?style=for-the-badge&logo=apple&logoColor=white" alt="MacOS compatible">
+  </a>
 </p>
 
 PyZWOASI is a Python binding for the ZWO ASI SDK. No other Python packages or dependencies are required. Windows and Linux compatible.
@@ -34,7 +38,7 @@ The installer will take in charge the machine configuration and choose the right
 </p>
 
 - [x] Add Linux support
-- [ ] Add MacOS support
+- [x] Add MacOS support
 - [ ] Add Android support
 - [ ] Add more precise error handling
 - [ ] Add missing functions from the ZWO ASI SDK
