@@ -1,7 +1,7 @@
 import ctypes, unittest
 
 from pyzwoasi.pyzwoasi import CameraInfo, ControlCaps
-from pyzwoasi.pyzwoasi import cameraCheck, closeCamera, disableDarkSubtract, getCameraProperty, getCameraPropertyByID, getControlCaps, getControlValue, getDroppedFrames, getNumOfConnectedCameras, getNumOfControls, getProductIDs, getROIFormat, getSDKVersion, getSerialNumber, getStartPos, getVideoData, initCamera, openCamera, sendSoftTrigger, setControlValue, setROIFormat, setStartPos, startVideoCapture, stopVideoCapture
+from pyzwoasi.pyzwoasi import cameraCheck, closeCamera, disableDarkSubtract, getCameraProperty, getCameraPropertyByID, getControlCaps, getControlValue, getDroppedFrames, getNumOfConnectedCameras, getNumOfControls, getProductIDs, getROIFormat, getSDKVersion, getSerialNumber, getStartPos, getVideoData, initCamera, openCamera, sendSoftTrigger, setControlValue, setROIFormat, setStartPos, startExposure, startVideoCapture, stopExposure, stopVideoCapture
 
 class TestASICamera2(unittest.TestCase):
         def test_getNumOfConnectedCameras(self):
@@ -415,6 +415,29 @@ class TestASICamera2(unittest.TestCase):
                     self.fail(f"getVideoData raised error unexpectedly: {e}")
                 finally:
                     stopVideoCapture(cameraInfo.CameraID)
+                    closeCamera(cameraInfo.CameraID)
+
+        def test_startStopExposure(self):
+            numCameras = getNumOfConnectedCameras()
+            for i in range(numCameras):
+                cameraInfo = getCameraProperty(i)
+                try:
+                    openCamera(cameraInfo.CameraID)
+                    initCamera(cameraInfo.CameraID)
+                
+                    try: # Test start exposure
+                        startExposure(cameraInfo.CameraID, False)
+                    except ValueError as e:
+                        self.fail(f"startExposure raised error unexpectedly: {e}")
+                
+                    try: # Test stop exposure
+                        stopExposure(cameraInfo.CameraID)
+                    except ValueError as e:
+                        self.fail(f"stopExposure raised error unexpectedly: {e}")
+
+                except ValueError as e:
+                    self.fail(f"test_startStopExposure raised error unexpectedly: {e}")
+                finally:
                     closeCamera(cameraInfo.CameraID)
 
 if __name__ == '__main__':

@@ -472,11 +472,33 @@ lib.ASIPulseGuideOff.restype = ctypes.c_int
 
 # Defining ASI_ERROR_CODE ASIStartExposure(int iCameraID, ASI_BOOL bIsDark)
 lib.ASIStartExposure.restype = ctypes.c_int
-# ============== TO BE DONE ==============
+lib.ASIStartExposure.argtypes = [ctypes.c_int, ctypes.c_int]
+def startExposure(cameraID, isDark):
+    """
+    @brief Starts exposure
+
+    @note Usually used when long exposure required
+
+    @param cameraID ID of the camera
+    @param isDark   Boolean indicating dark frame if there is mechanical
+                    shutter on the camera. Useles otherwise
+    """
+    errorCode = lib.ASIStartExposure(cameraID, 1 if isDark else 0)
+    if errorCode != 0:
+        raise ValueError(f"Failed to start exposure for cameraID {cameraID}. Error code: {errorCode}")
 
 # Defining ASI_ERROR_CODE ASIStopExposure(int iCameraID)
 lib.ASIStopExposure.restype = ctypes.c_int
-# ============== TO BE DONE ==============
+lib.ASIStopExposure.argtypes = [ctypes.c_int]
+def stopExposure(cameraID):
+    """
+    @brief Stops long exposure which is on
+
+    @param cameraID ID of the camera
+    """
+    errorCode = lib.ASIStopExposure(cameraID)
+    if errorCode != 0:
+        raise ValueError(f"Failed to stop exposure for cameraID {cameraID}. Error code: {errorCode}")
 
 # Defining ASI_ERROR_CODE ASIGetExpStatus(int iCameraID, ASI_EXPOSURE_STATUS *pExpStatus)
 lib.ASIGetExpStatus.restype = ctypes.c_int
