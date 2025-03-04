@@ -6,7 +6,8 @@
   </a> <br>
   <a href="https://www.microsoft.com/windows/">
     <img src="https://img.shields.io/badge/Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white" alt="Windows compatible">
-  </a>
+  </a> 
+  &ensp;
   <a href="https://www.kernel.org/">
     <img src="https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black" alt="Linux compatible">
   </a>
