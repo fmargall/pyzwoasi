@@ -20,8 +20,8 @@ def getDllFiles():
 
 setup(
     name='pyzwoasi',
-    #use_scm_version=True,
-    #setup_requires=['setuptools_scm'],
+    use_scm_version=True,
+    setup_requires=['setuptools_scm'],
     version=getVersion(),
     packages=find_packages(),
     data_files=getDllFiles(),
