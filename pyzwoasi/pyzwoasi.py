@@ -526,8 +526,18 @@ lib.ASISetCameraMode.restype = ctypes.c_int
 # =============== TO BE DONE ===============
 
 # Defining ASI_ERROR_CODE ASISendSoftTrigger(int iCameraID, ASI_BOOL bStart)
+lib.ASISendSoftTrigger.argtypes = [ctypes.c_int, ctypes.c_int]
 lib.ASISendSoftTrigger.restype = ctypes.c_int
-# ================ TO BE DONE ================
+def sendSoftTrigger(cameraID, start):
+    """
+    @brief Sends a softTrigger to the camera
+
+    @param cameraID ID of the camera
+    @param start    Boolean indicating if the trigger should start
+    """
+    errorCode = lib.ASISendSoftTrigger(cameraID, 1 if start else 0)
+    if errorCode != 0:
+        raise ValueError(f"Failed to send soft trigger for cameraID {cameraID}. Error code: {errorCode}")
 
 # Defining ASIGetSerialNumber(int iCameraID, ASI_SN* pSN)
 lib.ASIGetSerialNumber.argtypes = [ctypes.c_int, ctypes.POINTER(SN)]

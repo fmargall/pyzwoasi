@@ -1,7 +1,7 @@
 import ctypes, unittest
 
-from src.main import CameraInfo, ControlCaps
-from src.main import cameraCheck, closeCamera, disableDarkSubtract, getCameraProperty, getCameraPropertyByID, getControlCaps, getControlValue, getDroppedFrames, getNumOfConnectedCameras, getNumOfControls, getProductIDs, getROIFormat, getSDKVersion, getSerialNumber, getStartPos, getVideoData, initCamera, openCamera, setControlValue, setROIFormat, setStartPos, startVideoCapture, stopVideoCapture
+from pyzwoasi.pyzwoasi import CameraInfo, ControlCaps
+from pyzwoasi.pyzwoasi import cameraCheck, closeCamera, disableDarkSubtract, getCameraProperty, getCameraPropertyByID, getControlCaps, getControlValue, getDroppedFrames, getNumOfConnectedCameras, getNumOfControls, getProductIDs, getROIFormat, getSDKVersion, getSerialNumber, getStartPos, getVideoData, initCamera, openCamera, sendSoftTrigger, setControlValue, setROIFormat, setStartPos, startVideoCapture, stopVideoCapture
 
 class TestASICamera2(unittest.TestCase):
         def test_getNumOfConnectedCameras(self):
@@ -145,6 +145,22 @@ class TestASICamera2(unittest.TestCase):
             sdkVersion = getSDKVersion()
             self.assertIsInstance(sdkVersion, str)
             self.assertEqual(sdkVersion, "1, 37, 0, 0") # Current version of the SDK
+
+        def test_sendSoftTrigger(self):
+            numCameras = getNumOfConnectedCameras()
+            for i in range(numCameras):
+                cameraInfo = getCameraProperty(i)
+                try:
+                    openCamera(cameraInfo.CameraID)
+                    initCamera(cameraInfo.CameraID)
+            
+                    sendSoftTrigger(cameraInfo.CameraID, True)  # Test sending start trigger
+                    sendSoftTrigger(cameraInfo.CameraID, False) # Test sending stop trigger
+            
+                except ValueError as e:
+                    self.fail(f"sendSoftTrigger raised error unexpectedly: {e}")
+                finally:
+                    closeCamera(cameraInfo.CameraID)
 
         def test_getSerialNumber(self):
             numCameras = getNumOfConnectedCameras()
