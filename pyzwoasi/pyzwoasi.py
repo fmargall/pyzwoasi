@@ -4,8 +4,9 @@ import os
 
 
 # Chosing and reading correct dll
+system = platform.system()
 arch = platform.architecture()[0]
-dllPath = os.path.join(os.path.dirname(__file__), 'lib', 'x64' if arch == '64bit' else 'x86', 'ASICamera2.dll')
+dllPath = os.path.join(os.path.dirname(__file__), 'lib', system, 'x64' if arch == '64bit' else 'x86', 'ASICamera2.dll' if system == 'Windows' else 'libASICamera2.a')
 lib = ctypes.cdll.LoadLibrary(dllPath)
 
 
