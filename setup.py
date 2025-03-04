@@ -10,12 +10,22 @@ def getVersion():
 
 
 def getDllFiles():
+    system = platform.system()
     arch = platform.architecture()[0]
-    if arch == '64bit':
-        dllPath = 'pyzwoasi/lib/x64/ASICamera2.dll'
+    if system == 'Windows':
+        if arch == '64bit':
+            dllPath = 'pyzwoasi/lib/x64/ASICamera2.dll'
+        else:
+            dllPath = 'pyzwoasi/lib/x86/ASICamera2.dll'
+    elif system == 'Linux':
+        if arch == '64bit':
+            dllPath = 'pyzwoasi/lib/x64/libASICamera2.a'
+        else:
+            dllPath = 'pyzwoasi/lib/x86/libASICamera2.a'
     else:
-        dllPath = 'pyzwoasi/lib/x86/ASICamera2.dll'
-    return [(os.path.join('lib', arch), [dllPath])]
+        raise ValueError(f"Unsupported system: {system}")
+
+    return [(os.path.join('lib', system, arch), [dllPath])]
 
 
 setup(

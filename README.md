@@ -20,7 +20,8 @@ python -m pip install pyzwoasi
 The installer will take in charge the machine configuration and choose the right compiled library file from ZWO. You will not have useless `.dll` files on your machine, only the needed ones.
 
 ## Roadmap
-- [ ] Add Linux support
+- [x] Add Linux support
+- [ ] Add MacOS support
 - [ ] Add Android support
 - [ ] Add more precise error handling
 - [ ] Add missing functions from the ZWO ASI SDK
