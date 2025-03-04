@@ -3,10 +3,16 @@
 <p align="center">
   <a href="https://www.zwoastro.com/software/">
     <img src="https://img.shields.io/badge/Supported_ASI_SDK_Version-1.37-blue" alt="Supported ASI SDK version : 1.37">
+  </a> <br>
+  <a href="https://www.microsoft.com/windows/">
+    <img src="https://img.shields.io/badge/Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white" alt="Windows compatible">
+  </a>
+  <a href="https://www.kernel.org/">
+    <img src="https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black" alt="Linux compatible">
   </a>
 </p>
 
-PyZWOASI is a Python binding for the ZWO ASI SDK. No other Python packages or dependencies are required. 
+PyZWOASI is a Python binding for the ZWO ASI SDK. No other Python packages or dependencies are required. Windows and Linux compatible.
 
 ## Installation
 
@@ -20,6 +26,12 @@ python -m pip install pyzwoasi
 The installer will take in charge the machine configuration and choose the right compiled library file from ZWO. You will not have useless `.dll` files on your machine, only the needed ones.
 
 ## Roadmap
+
+<p align="center">
+    <img src=https://geps.dev/progress/55 alt="55%"><br>
+    <sup>Current number of supported ASI SDK v1.37 features: 24/43
+</p>
+
 - [x] Add Linux support
 - [ ] Add MacOS support
 - [ ] Add Android support
