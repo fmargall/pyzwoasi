@@ -87,8 +87,7 @@ jobs:
     
     - name: Determines if prerelease
       id: prerelease
-      run: >-
-        # Checks if we are talking about a pre-release or not
+      run: |
         if [[ "$GITHUB_REF_NAME" =~ ^v?[0-9]+\.[0-9]+\.[0-9]+[a-zA-Z].* || "$GITHUB_REF_NAME" =~ ^[^v].* ]]; then
           echo "PRERELEASE=true" >> $GITHUB_ENV
         else
