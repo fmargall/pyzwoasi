@@ -57,8 +57,8 @@ jobs:
 
     - name: Publish distribution to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
-      with:
-        repository-url: https://pypi.org/legacy/ # test.pypi.org for testing
+      # with: # These two lines are only for test-PyPI
+        # repository-url: https://test.pypi.org/legacy/
 
   github-release:
     name: >-
