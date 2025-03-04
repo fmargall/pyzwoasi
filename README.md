@@ -17,7 +17,7 @@ python -m pip install --upgrade pip
 python -m pip install pyzwoasi
 ```
 
-The installer will takes in charge the machine configuration and chooses the right compiled library file from ZWO.
+The installer will take in charge the machine configuration and choose the right compiled library file from ZWO. You will not have useless `.dll` files on your machine, only the needed ones.
 
 ## Roadmap
 - [ ] Add Linux support

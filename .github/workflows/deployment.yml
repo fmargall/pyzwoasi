@@ -118,7 +118,7 @@ jobs:
           gh release create \
           "$GITHUB_REF_NAME" \
           --repo "$GITHUB_REPOSITORY" \
-          --title "$RELEASE_NAME"
+          --title "$RELEASE_NAME" \
           --notes ""
         fi
     - name: Upload artifact signatures to GitHub Release
