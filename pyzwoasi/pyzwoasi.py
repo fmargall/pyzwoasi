@@ -383,7 +383,24 @@ def getDroppedFrames(cameraID):
 
 # Defining ASI_ERROR_CODE ASIEnableDarkSubtract(int iCameraID, char *pcBMPPath)
 lib.ASIEnableDarkSubtract.restype = ctypes.c_int
-# ================= TO BE DONE =================
+lib.ASIEnableDarkSubtract.argtypes = [ctypes.c_int, ctypes.c_char_p]
+def enableDarkSubtract(cameraID, bmpPath):
+    """
+    @brief Enables the dark subtract function from a dark BMP file
+
+    @notes Used when there is hot pixel or wheb long exposure is needed.
+           Dark file should be made from the "dark subtract" function of
+           the "video capture filter" directshow page.
+           Dark file's size should be the same of camera's max width and
+           height and should be RGB8 raw format. It will stay on even if 
+           the ROI settings are modified.
+
+    @param cameraID ID of the camera
+    @param bmpPath  Path to the BMP file used for dark substraction
+    """
+    errorCode = lib.ASIEnableDarkSubtract(cameraID, bmpPath.encode('utf-8'))
+    if errorCode != 0:
+        raise ValueError(f"Failed to enable dark subtract for cameraID {cameraID}. Error code: {errorCode}")
 
 # Defining ASI_ERROR_CODE ASIDisableDarkSubtract(int iCameraID)
 lib.ASIDisableDarkSubtract.restype = ctypes.c_int

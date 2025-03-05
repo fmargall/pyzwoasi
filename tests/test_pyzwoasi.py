@@ -1,7 +1,7 @@
-import ctypes, unittest
+import ctypes, os, tempfile, unittest
 
 from pyzwoasi.pyzwoasi import CameraInfo, ControlCaps
-from pyzwoasi.pyzwoasi import cameraCheck, closeCamera, disableDarkSubtract, getCameraProperty, getCameraPropertyByID, getControlCaps, getControlValue, getDroppedFrames, getNumOfConnectedCameras, getNumOfControls, getProductIDs, getROIFormat, getSDKVersion, getSerialNumber, getStartPos, getVideoData, initCamera, openCamera, sendSoftTrigger, setControlValue, setROIFormat, setStartPos, startExposure, startVideoCapture, stopExposure, stopVideoCapture
+from pyzwoasi.pyzwoasi import cameraCheck, closeCamera, disableDarkSubtract, enableDarkSubtract, getCameraProperty, getCameraPropertyByID, getControlCaps, getControlValue, getDroppedFrames, getNumOfConnectedCameras, getNumOfControls, getProductIDs, getROIFormat, getSDKVersion, getSerialNumber, getStartPos, getVideoData, initCamera, openCamera, sendSoftTrigger, setControlValue, setROIFormat, setStartPos, startExposure, startVideoCapture, stopExposure, stopVideoCapture
 
 class TestASICamera2(unittest.TestCase):
         def test_getNumOfConnectedCameras(self):
@@ -341,18 +341,33 @@ class TestASICamera2(unittest.TestCase):
                 finally:
                     closeCamera(cameraInfo.CameraID)
 
-        def test_disableDarkSubstract(self):
+        def test_darkSubstract(self):
             numCameras = getNumOfConnectedCameras()
             for i in range(numCameras):
                 cameraInfo = getCameraProperty(i)
                 try:
                     openCamera(cameraInfo.CameraID)
                     initCamera(cameraInfo.CameraID)
+
+                    # Create a temporary BMP file with RGB8 raw format and camera dimensions
+                    width, height, binning, imgType = getROIFormat(cameraInfo.CameraID)
+                    with tempfile.NamedTemporaryFile(delete=False, suffix=".bmp") as tempBmp:
+                        bmpHeader  = b'BM' + (54 + width * height * 3).to_bytes(4, 'little') + b'\x00\x00\x00\x00' + b'\x36\x00\x00\x00' + b'\x28\x00\x00\x00'
+                        bmpHeader += width.to_bytes(4, 'little') + height.to_bytes(4, 'little') + b'\x01\x00\x18\x00' + b'\x00\x00\x00\x00' + (width * height * 3).to_bytes(4, 'little')
+                        bmpHeader += b'\x13\x0B\x00\x00' + b'\x13\x0B\x00\x00' + b'\x00\x00\x00\x00' + b'\x00\x00\x00\x00'
+                        tempBmp.write(bmpHeader)
+                        tempBmp.write(b'\x00' * (width * height * 3))
+                        tempBmpPath = tempBmp.name
+
+                    enableDarkSubtract(cameraInfo.CameraID, tempBmpPath)
                     disableDarkSubtract(cameraInfo.CameraID)
+
                 except ValueError as e:
-                    self.fail(f"disableDarkSubtract raised error unexpectedly: {e}")
+                    self.fail(f"test_DarkSubtract raised error unexpectedly: {e}")
                 finally:
                     closeCamera(cameraInfo.CameraID)
+                    if os.path.exists(tempBmpPath):
+                        os.remove(tempBmpPath)
 
         def test_startVideoCapture(self):
             numCameras = getNumOfConnectedCameras()
