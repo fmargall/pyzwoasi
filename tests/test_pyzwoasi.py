@@ -1,7 +1,8 @@
+from multiprocessing import Value
 import ctypes, os, tempfile, unittest
 
 from pyzwoasi.pyzwoasi import CameraInfo, ControlCaps, ID
-from pyzwoasi.pyzwoasi import cameraCheck, closeCamera, disableDarkSubtract, enableDarkSubtract, getCameraProperty, getCameraPropertyByID, getControlCaps, getControlValue, getDroppedFrames, getID, getNumOfConnectedCameras, getNumOfControls, getProductIDs, getROIFormat, getSDKVersion, getSerialNumber, getStartPos, getVideoData, initCamera, openCamera, pulseGuideOn, pulseGuideOff, sendSoftTrigger, setControlValue, setID, setROIFormat, setStartPos, startExposure, startVideoCapture, stopExposure, stopVideoCapture
+from pyzwoasi.pyzwoasi import cameraCheck, closeCamera, disableDarkSubtract, enableDarkSubtract, getCameraMode, getCameraProperty, getCameraPropertyByID, getControlCaps, getControlValue, getDroppedFrames, getID, getNumOfConnectedCameras, getNumOfControls, getProductIDs, getROIFormat, getSDKVersion, getSerialNumber, getStartPos, getVideoData, initCamera, openCamera, pulseGuideOn, pulseGuideOff, sendSoftTrigger, setCameraMode, setControlValue, setID, setROIFormat, setStartPos, startExposure, startVideoCapture, stopExposure, stopVideoCapture
 
 class TestASICamera2(unittest.TestCase):
         def test_getNumOfConnectedCameras(self):
@@ -504,7 +505,29 @@ class TestASICamera2(unittest.TestCase):
                 closeCamera(cameraInfo.CameraID)
         
         def test_getAndSetCameraMode(self):
+            numCameras = getNumOfConnectedCameras()
+            for i in range(numCameras):
+                cameraInfo = getCameraProperty(i)
 
+                try:
+                    openCamera(cameraInfo.CameraID)
+                    initCamera(cameraInfo.CameraID)
+                    for newCameraMode in range(7): # 7 camera modes are available
+                        try: # Test setCameraMode
+                            setCameraMode(cameraInfo.CameraID, newCameraMode)
+                        except ValueError as e:
+                            self.fail(f"setCameraMode raised error unexpectedly: {e}")
+                        else: # Test getCameraMode
+                            try:
+                                cameraMode = getCameraMode(cameraInfo.CameraID)
+                                self.assertEqual(cameraMode, newCameraMode)
+                            except ValueError as e:
+                                self.fail(f"getCameraMode raised error unexpectedly: {e}")
+                
+                except ValueError as e:
+                    self.fail(f"test_getAndSetCameraMode raised error unexpectedly: {e}")
+                finally:
+                    closeCamera(cameraInfo.CameraID)
                     
 
 if __name__ == '__main__':
