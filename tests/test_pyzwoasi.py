@@ -1,7 +1,7 @@
 import ctypes, os, tempfile, unittest
 
 from pyzwoasi.pyzwoasi import CameraInfo, ControlCaps, ID
-from pyzwoasi.pyzwoasi import cameraCheck, closeCamera, disableDarkSubtract, enableDarkSubtract, getCameraProperty, getCameraPropertyByID, getControlCaps, getControlValue, getDroppedFrames, getID, getNumOfConnectedCameras, getNumOfControls, getProductIDs, getROIFormat, getSDKVersion, getSerialNumber, getStartPos, getVideoData, initCamera, openCamera, sendSoftTrigger, setControlValue, setID, setROIFormat, setStartPos, startExposure, startVideoCapture, stopExposure, stopVideoCapture
+from pyzwoasi.pyzwoasi import cameraCheck, closeCamera, disableDarkSubtract, enableDarkSubtract, getCameraProperty, getCameraPropertyByID, getControlCaps, getControlValue, getDroppedFrames, getID, getNumOfConnectedCameras, getNumOfControls, getProductIDs, getROIFormat, getSDKVersion, getSerialNumber, getStartPos, getVideoData, initCamera, openCamera, pulseGuideOn, pulseGuideOff, sendSoftTrigger, setControlValue, setID, setROIFormat, setStartPos, startExposure, startVideoCapture, stopExposure, stopVideoCapture
 
 class TestASICamera2(unittest.TestCase):
         def test_getNumOfConnectedCameras(self):
@@ -459,21 +459,50 @@ class TestASICamera2(unittest.TestCase):
             numCameras = getNumOfConnectedCameras()
             for i in range(numCameras):
                 cameraInfo = getCameraProperty(i)
-                originalID = getID(cameraInfo.CameraID)
-                newID = ID((ctypes.c_ubyte * 8)(1, 2, 3, 4, 5, 6, 7, 8))
-                try:
-                    openCamera(cameraInfo.CameraID)
-                    initCamera(cameraInfo.CameraID)
-                    setID(cameraInfo.CameraID, newID)
-                    self.assertNotEqual(getID(cameraInfo.CameraID), originalID)
 
+                try: # Test getID
+                    originalID = getID(cameraInfo.CameraID)
                 except ValueError as e:
-                    self.fail(f"test_getAndSetID raised error unexpectedly: {e}")
-                finally:
-                    # Restore the original ID to avoid side effects
-                    setID(cameraInfo.CameraID, originalID)
-                    self.assertEqual(getID(cameraInfo.CameraID), originalID))
-                    closeCamera(cameraInfo.CameraID)
+                    self.fail(f"getID raised error unexpectedly: {e}")
+                else:
+                    newID = ID((ctypes.c_ubyte * 8)(1, 2, 3, 4, 5, 6, 7, 8))
+                    try: # Test setID
+                        openCamera(cameraInfo.CameraID)
+                        initCamera(cameraInfo.CameraID)
+                        setID(cameraInfo.CameraID, newID)
+                        self.assertNotEqual(getID(cameraInfo.CameraID), originalID)
+                    except ValueError as e:
+                        self.fail(f"setID raised error unexpectedly: {e}")
+                    finally:
+                        # Restore the original ID to avoid side effects
+                        setID(cameraInfo.CameraID, originalID)
+                        self.assertEqual(getID(cameraInfo.CameraID), originalID))
+                        closeCamera(cameraInfo.CameraID)
+
+        def test_pulseGuide(self):
+            numCameras = getNumOfConnectedCameras()
+            for i in range(numCameras):
+                cameraInfo = getCameraProperty(i)
+
+                # Only test cameras with ST4 port
+                if not cameraInfo.ST4Port:
+                    continue
+
+                openCamera(cameraInfo.CameraID)
+                initCamera(cameraInfo.CameraID)
+                for direction in range(4):
+                    try: # Test pulseGuideOn
+                        pulseGuideOn(cameraInfo.CameraID, direction)
+                    except ValueError as e:
+                        self.fail(f"pulseGuideOn raised error unexpectedly: {e}")
+                    else:
+                        try: # Test pulseGuideOff
+                            pulseGuideOff(cameraInfo.CameraID)
+                        except ValueError as e:
+                            self.fail(f"pulseGuideOff raised error unexpectedly: {e}")
+
+                closeCamera(cameraInfo.CameraID)
+                    
 
 if __name__ == '__main__':
     unittest.main()
