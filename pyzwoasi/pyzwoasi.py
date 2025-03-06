@@ -481,11 +481,39 @@ lib.ASIGetVideoDataGPS.restype = ctypes.c_int
 
 # Defining ASI_ERROR_CODE ASIPulseGuideOn(int iCameraID, ASI_GUIDE_DIRECTION direction)
 lib.ASIPulseGuideOn.restype = ctypes.c_int
-# ============== TO BE DONE ==============
+lib.ASIPulseGuideOn.argtypes = [ctypes.c_int, ctypes.c_int]
+def pulseGuideOn(cameraID, direction):
+    """
+    @brief Pulsing guide on the ST4 port set to on
+
+    @note This function only works on the module which has ST4 port
+
+    @param cameraID  ID of the camera
+    @param direction Direction of the guider. Should be set to:
+                      - 0 for North    - 1 for South
+                      - 2 for East     - 3 for West
+    """
+    errorCode = lib.ASIPulseGuideOn(cameraID, direction)
+    if errorCode != 0:
+        raise ValueError(f"Failed to pulse guide on for cameraID {cameraID}. Error code: {errorCode}")
 
 # Defining ASI_ERROR_CODE ASIPulseGuideOff(int iCameraID, ASI_GUIDE_DIRECTION direction)
 lib.ASIPulseGuideOff.restype = ctypes.c_int
-# ============== TO BE DONE ==============
+lib.ASIPulseGuideOff.argtypes = [ctypes.c_int, ctypes.c_int]
+def pulseGuideOff(cameraID, direction):
+    """
+    @brief Pulsing guide on the ST4 port set to off
+
+    @note This function only works on the module which has ST4 port
+
+    @param cameraID  ID of the camera
+    @param direction Direction of the guider. Should be set to:
+                      - 0 for North    - 1 for South
+                      - 2 for East     - 3 for West
+    """
+    errorCode = lib.ASIPulseGuideOff(cameraID, direction)
+    if errorCode != 0:
+        raise ValueError(f"Failed to pulse guide off for cameraID {cameraID}. Error code: {errorCode}")
 
 # Defining ASI_ERROR_CODE ASIStartExposure(int iCameraID, ASI_BOOL bIsDark)
 lib.ASIStartExposure.restype = ctypes.c_int
