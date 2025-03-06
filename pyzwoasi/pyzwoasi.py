@@ -56,16 +56,22 @@ class ControlCaps(ctypes.Structure):
         ("Unused"         , ctypes.c_char * 32)
     ]
 
-# Defining ASI_ID typedef
+# Defining struct _ASI_ID
 class ID(ctypes.Structure):
     _fields_ = [
         ("ID", ctypes.c_ubyte * 8) # 8-byte array
     ]
 
-# Defining ASI_SN typedef
+# Defining struct _ASI_SN
 class SN(ctypes.Structure):
     _fields_ = [
         ("SN", ctypes.c_ubyte * 8) # 8-byte array
+    ]
+
+# Defining struct _ASI_SUPPORTED_MODE
+class SupportedMode(ctypes.Structure):
+    _fields_ = [
+        ("SupportedMode", ctypes.c_int * 16)
     ]
 
 # Defining int ASIGetNumOfConnectedCameras()
@@ -613,7 +619,24 @@ def getSDKVersion():
 
 # Defining ASI_ERROR_CODE ASIGetCameraSupportMode(int iCameraID, ASI_SUPPORTED_MODE* pSupportedMode)
 lib.ASIGetCameraSupportMode.restype = ctypes.c_int
-# ================== TO BE DONE ==================
+lib.ASIGetCameraSupportMode.argtypes = [ctypes.c_int, ctypes.POINTER(SupportedMode)]
+def getCameraSupportMode(cameraID):
+    """
+    @brief Gets the supported mode of the camera
+
+    @param cameraID ID of the camera
+
+    @return int corresponding to the supported mode:
+             - 0 for normal              - 1 for trigger soft edge
+             - 2 for trigger rise edge   - 3 for trigger fall edge
+             - 4 for trigger soft level  - 5 for trigger high level
+             - 6 for trigger low level
+    """
+    supportedMode = SupportedMode()
+    errorCode = lib.ASIGetCameraSupportMode(cameraID, ctypes.byref(supportedMode))
+    if errorCode != 0:
+        raise ValueError(f"Failed to get camera support mode for cameraID {cameraID}. Error code: {errorCode}")
+    return supportedMode
 
 # Defining ASI_ERROR_CODE ASIGetCameraMode(int iCameraID, ASI_CAMERA_MODE* mode)
 lib.ASIGetCameraMode.restype = ctypes.c_int
