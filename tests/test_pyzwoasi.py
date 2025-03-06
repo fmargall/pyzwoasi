@@ -502,6 +502,9 @@ class TestASICamera2(unittest.TestCase):
                             self.fail(f"pulseGuideOff raised error unexpectedly: {e}")
 
                 closeCamera(cameraInfo.CameraID)
+        
+        def test_getAndSetCameraMode(self):
+
                     
 
 if __name__ == '__main__':

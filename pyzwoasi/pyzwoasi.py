@@ -624,6 +624,8 @@ def getCameraMode(cameraID):
 
     @note Should be called only when IsTriggerCam in CameraInfo is true
 
+    @param cameraID ID of the camera
+
     @return int corresponding to the camera mode:
              - 0 for normal              - 1 for trigger soft edge
              - 2 for trigger rise edge   - 3 for trigger fall edge
@@ -639,7 +641,22 @@ def getCameraMode(cameraID):
 # Defining ASI_ERROR_CODE ASISetCameraMode(int iCameraID, ASI_CAMERA_MODE mode)
 lib.ASISetCameraMode.restype = ctypes.c_int
 lib.ASISetCameraMode.argtypes = [ctypes.c_int, ctypes.c_int]
-# =============== TO BE DONE ===============
+def setCameraMode(cameraID, cameraMode):
+    """
+    @brief Sets the camera mode
+
+    @note Should be called only when IsTriggerCam in CameraInfo is true
+
+    @param cameraID   ID of the camera
+    @param cameraMode int corresponding to the camera mode to set:
+                       - 0 for normal              - 1 for trigger soft edge
+                       - 2 for trigger rise edge   - 3 for trigger fall edge
+                       - 4 for trigger soft level  - 5 for trigger high level
+                       - 6 for trigger low level
+    """
+    errorCode = lib.ASISetCameraMode(cameraID, cameraMode)
+    if errorCode != 0:
+        raise ValueError(f"Failed to set camera mode for cameraID {cameraID}. Error code: {errorCode}")
 
 # Defining ASI_ERROR_CODE ASISendSoftTrigger(int iCameraID, ASI_BOOL bStart)
 lib.ASISendSoftTrigger.restype = ctypes.c_int
