@@ -567,11 +567,14 @@ def getID(cameraID):
     @note Only available for USB 3.0 cameras
 
     @param cameraID ID of the camera
+
+    @return Structure containing the ID of the camera
     """
     cameraIDStruct = ID()
     errorCode = lib.ASIGetID(cameraID, ctypes.byref(cameraIDStruct))
     if errorCode != 0:
         raise ValueError(f"Failed to get ID for cameraID {cameraID}. Error code: {errorCode}")
+    return cameraIDStruct
 
 # Defining ASI_ERROR_CODE ASISetID(int iCameraID, ASI_ID ID)
 lib.ASISetID.restype = ctypes.c_int
@@ -608,22 +611,39 @@ def getSDKVersion():
     """
     return lib.ASIGetSDKVersion().decode('utf-8')
 
-
 # Defining ASI_ERROR_CODE ASIGetCameraSupportMode(int iCameraID, ASI_SUPPORTED_MODE* pSupportedMode)
 lib.ASIGetCameraSupportMode.restype = ctypes.c_int
 # ================== TO BE DONE ==================
 
 # Defining ASI_ERROR_CODE ASIGetCameraMode(int iCameraID, ASI_CAMERA_MODE* mode)
 lib.ASIGetCameraMode.restype = ctypes.c_int
-# =============== TO BE DONE ===============
+lib.ASIGetCameraMode.argtypes = [ctypes.c_int, ctypes.POINTER(ctypes.c_int)]
+def getCameraMode(cameraID):
+    """
+    @brief Gets the current camera mode
+
+    @note Should be called only when IsTriggerCam in CameraInfo is true
+
+    @return int corresponding to the camera mode:
+             - 0 for normal              - 1 for trigger soft edge
+             - 2 for trigger rise edge   - 3 for trigger fall edge
+             - 4 for trigger soft level  - 5 for trigger high level
+             - 6 for trigger low level
+    """
+    cameraMode = ctypes.c_int()
+    errorCode = lib.ASIGetCameraMode(cameraID, ctypes.byref(cameraMode))
+    if errorCode != 0:
+        raise ValueError(f"Failed to get camera mode for cameraID {cameraID}. Error code: {errorCode}")
+    return cameraMode.value
 
 # Defining ASI_ERROR_CODE ASISetCameraMode(int iCameraID, ASI_CAMERA_MODE mode)
 lib.ASISetCameraMode.restype = ctypes.c_int
+lib.ASISetCameraMode.argtypes = [ctypes.c_int, ctypes.c_int]
 # =============== TO BE DONE ===============
 
 # Defining ASI_ERROR_CODE ASISendSoftTrigger(int iCameraID, ASI_BOOL bStart)
-lib.ASISendSoftTrigger.argtypes = [ctypes.c_int, ctypes.c_int]
 lib.ASISendSoftTrigger.restype = ctypes.c_int
+lib.ASISendSoftTrigger.argtypes = [ctypes.c_int, ctypes.c_int]
 def sendSoftTrigger(cameraID, start):
     """
     @brief Sends a softTrigger to the camera
