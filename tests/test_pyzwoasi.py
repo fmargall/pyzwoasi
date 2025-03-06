@@ -1,7 +1,7 @@
 import ctypes, os, tempfile, unittest
 
-from pyzwoasi.pyzwoasi import CameraInfo, ControlCaps
-from pyzwoasi.pyzwoasi import cameraCheck, closeCamera, disableDarkSubtract, enableDarkSubtract, getCameraProperty, getCameraPropertyByID, getControlCaps, getControlValue, getDroppedFrames, getNumOfConnectedCameras, getNumOfControls, getProductIDs, getROIFormat, getSDKVersion, getSerialNumber, getStartPos, getVideoData, initCamera, openCamera, sendSoftTrigger, setControlValue, setROIFormat, setStartPos, startExposure, startVideoCapture, stopExposure, stopVideoCapture
+from pyzwoasi.pyzwoasi import CameraInfo, ControlCaps, ID
+from pyzwoasi.pyzwoasi import cameraCheck, closeCamera, disableDarkSubtract, enableDarkSubtract, getCameraProperty, getCameraPropertyByID, getControlCaps, getControlValue, getDroppedFrames, getID, getNumOfConnectedCameras, getNumOfControls, getProductIDs, getROIFormat, getSDKVersion, getSerialNumber, getStartPos, getVideoData, initCamera, openCamera, sendSoftTrigger, setControlValue, setID, setROIFormat, setStartPos, startExposure, startVideoCapture, stopExposure, stopVideoCapture
 
 class TestASICamera2(unittest.TestCase):
         def test_getNumOfConnectedCameras(self):
@@ -453,6 +453,26 @@ class TestASICamera2(unittest.TestCase):
                 except ValueError as e:
                     self.fail(f"test_startStopExposure raised error unexpectedly: {e}")
                 finally:
+                    closeCamera(cameraInfo.CameraID)
+
+        def test_getAndSetID(self):
+            numCameras = getNumOfConnectedCameras()
+            for i in range(numCameras):
+                cameraInfo = getCameraProperty(i)
+                originalID = getID(cameraInfo.CameraID)
+                newID = ID((ctypes.c_ubyte * 8)(1, 2, 3, 4, 5, 6, 7, 8))
+                try:
+                    openCamera(cameraInfo.CameraID)
+                    initCamera(cameraInfo.CameraID)
+                    setID(cameraInfo.CameraID, newID)
+                    self.assertNotEqual(getID(cameraInfo.CameraID), originalID)
+
+                except ValueError as e:
+                    self.fail(f"test_getAndSetID raised error unexpectedly: {e}")
+                finally:
+                    # Restore the original ID to avoid side effects
+                    setID(cameraInfo.CameraID, originalID)
+                    self.assertEqual(getID(cameraInfo.CameraID), originalID))
                     closeCamera(cameraInfo.CameraID)
 
 if __name__ == '__main__':

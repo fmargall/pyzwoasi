@@ -38,8 +38,8 @@ The installer will take in charge the machine configuration and choose the right
 ## Roadmap
 
 <p align="center">
-    <img src=https://geps.dev/progress/62 alt="62%"><br>
-    <sup>Current number of supported ASI SDK v1.37 features: 27/43
+    <img src=https://geps.dev/progress/67 alt="67%"><br>
+    <sup>Current number of supported ASI SDK v1.37 features: 29/43
 </p>
 
 - [x] Add Linux support
@@ -57,7 +57,7 @@ This Python project will also be a test of different codings metrics and tools t
 - [ ] Computing code coverage using `coverage`
 - [ ] Static code analysis using `pylint`
 - [ ] Style guide enforcement using `black` or `flake8`
-- [ ] Writing a Git best practices charter for the project (atomic commits and explicits like `feat:`, `fix:`, `refactor:` and so on)
+- [ ] Writing a Git best practices charter for the project (atomic commits and explicits like `feat:`, `fix:`, `refactor:` and so on. More about this about [here](https://medium.com/@noriller/docs-conventional-commits-feat-fix-refactor-which-is-which-531614fcb65a) and [here](https://www.conventionalcommits.org/en/v1.0.0/))
 - [ ] Writing a security charter, using `bandit` and `safety` to ensure the code is secure
 - [ ] Making large documentation using `sphinx`, `readthedocs` and proposing metrics with `docstr-coverage`
 - [ ] Profiling the code with `cProfile` and `line_profiler`

@@ -74,7 +74,7 @@ def getNumOfConnectedCameras():
     """
     @brief Gets number of connected ASI cameras
 
-    @notes This should be the first API to be called
+    @note This should be the first API to be called
 
     @return Number of connected ASI cameras
     """
@@ -87,7 +87,7 @@ def getProductIDs():
     """
     @brief Gets product IDs of connected ASI cameras
 
-    @notes This API will be deprecated. Please use CameraCheck instead
+    @note This API will be deprecated. Please use CameraCheck instead
 
     @return List of product IDs of connected ASI cameras
     """
@@ -368,7 +368,7 @@ def getDroppedFrames(cameraID):
     """
     @brief Gets the number of dropped frames
 
-    @notes Drop frames happen when USB is traffic or harddisk write speed is slow
+    @note Drop frames happen when USB is traffic or harddisk write speed is slow
            it will reset to 0 after stop capture
 
     @param cameraID ID of the camera
@@ -388,7 +388,7 @@ def enableDarkSubtract(cameraID, bmpPath):
     """
     @brief Enables the dark subtract function from a dark BMP file
 
-    @notes Used when there is hot pixel or wheb long exposure is needed.
+    @note Used when there is hot pixel or wheb long exposure is needed.
            Dark file should be made from the "dark subtract" function of
            the "video capture filter" directshow page.
            Dark file's size should be the same of camera's max width and
@@ -409,7 +409,7 @@ def disableDarkSubtract(cameraID):
     """
     @brief Disables the dark subtract function
 
-    @notes Should be called at start if no dark function is used,
+    @note Should be called at start if no dark function is used,
            because the function is remembered on Windows platform
 
     @param cameraID ID of the camera
@@ -532,12 +532,34 @@ lib.ASIGetDataAfterExpGPS.restype = ctypes.c_int
 # Defining ASI_ERROR_CODE ASIGetID(int iCameraID, ASI_ID* pID)
 lib.ASIGetID.restype = ctypes.c_int
 lib.ASIGetID.argtypes = [ctypes.c_int, ctypes.POINTER(ID)]
-# ====================== TO BE DONE ======================
+def getID(cameraID):
+    """
+    @brief Gets the ID of the camera
+
+    @note Only available for USB 3.0 cameras
+
+    @param cameraID ID of the camera
+    """
+    cameraIDStruct = ID()
+    errorCode = lib.ASIGetID(cameraID, ctypes.byref(cameraIDStruct))
+    if errorCode != 0:
+        raise ValueError(f"Failed to get ID for cameraID {cameraID}. Error code: {errorCode}")
 
 # Defining ASI_ERROR_CODE ASISetID(int iCameraID, ASI_ID ID)
 lib.ASISetID.restype = ctypes.c_int
 lib.ASISetID.argtypes = [ctypes.c_int, ID]
-# ============== TO BE DONE ==============
+def setID(cameraID, newCameraID):
+    """
+    @brief Writes camera ID to flash.
+
+    @note Only available for USB 3.0 cameras
+
+    @param cameraID    ID of the camera
+    @param newCameraID New ID to set for the camera
+    """
+    errorCode = lib.ASISetID(cameraID, id)
+    if errorCode != 0:
+        raise ValueError(f"Failed to set ID for cameraID {cameraID}. Error code: {errorCode}")
 
 # Defining ASI_ERROR_CODE ASIGetGainOffset(int iCameraID, int *pOffset_HighestDR, int *pOffset_UnityGain, int *pGain_LowestRN, int *pOffset_LowestRN)
 lib.ASIGetGainOffset.restype = ctypes.c_int
