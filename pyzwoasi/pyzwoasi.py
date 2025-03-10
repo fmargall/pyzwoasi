@@ -557,6 +557,7 @@ lib.ASIGetExpStatus.restype = ctypes.c_int
 
 # Defining ASI_ERROR_CODE ASIGetDataAfterExp(int iCameraID, unsigned char* pBuffer, long lBuffSize)
 lib.ASIGetDataAfterExp.restype = ctypes.c_int
+lib.ASIGetDataAfterExp.argtypes = [ctypes.c_int, ctypes.POINTER(ctypes.c_ubyte), ctypes.c_long]
 # ================ TO BE DONE ================
 
 # Defining ASI_ERROR_CODE ASIGetDataAfterExpGPS(int iCameraID, unsigned char* pBuffer, long lBuffSize, ASI_GPS_DATA *gpsData)
@@ -600,10 +601,18 @@ def setID(cameraID, newCameraID):
 
 # Defining ASI_ERROR_CODE ASIGetGainOffset(int iCameraID, int *pOffset_HighestDR, int *pOffset_UnityGain, int *pGain_LowestRN, int *pOffset_LowestRN)
 lib.ASIGetGainOffset.restype = ctypes.c_int
+lib.ASIGetGainOffset.argtypes = [ctypes.c_int, ctypes.POINTER(ctypes.c_int), ctypes.POINTER(ctypes.c_int), ctypes.POINTER(ctypes.c_int), ctypes.POINTER(ctypes.c_int)]
+def getGainOffset(cameraID):
+    """
+    """
 # ============== TO BE DONE ==============
 
 # Defining ASI_ERROR_CODE ASIGetLMHGainOffset(int iCameraID, int* pLGain, int* pMGain, int* pHGain, int* pHOffset)
 lib.ASIGetLMHGainOffset.restype = ctypes.c_int
+lib.ASIGetLMHGainOffset.argtypes = [ctypes.c_int, ctypes.POINTER(ctypes.c_int), ctypes.POINTER(ctypes.c_int), ctypes.POINTER(ctypes.c_int), ctypes.POINTER(ctypes.c_int)]
+def getLMHGainOffset(cameraID):
+    """
+    """
 # ================ TO BE DONE ================
 
 # Defining char* ASIGetSDKVersion()

@@ -1,3 +1,5 @@
+![Header](./docs/pyzwoasi-header.png)
+
 # PyZWOASI &middot; <img src="https://github.com/fmargall/pyzwoasi/actions/workflows/deployment.yml/badge.svg" alt="Build status"> <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="MIT License"> <a href="https://github.com/qoomon/starlines"> <img src="https://starlines.qoo.monster/assets/fmargall/pyzwoasi" align="right" alt="Starline counter"/> </a>
 
 PyZWOASI is a Python binding for the ZWO ASI SDK. It is developped to be easy-to-use and functional, and, if I can make it, up-to-date.
