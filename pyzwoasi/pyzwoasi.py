@@ -558,7 +558,26 @@ lib.ASIGetExpStatus.restype = ctypes.c_int
 # Defining ASI_ERROR_CODE ASIGetDataAfterExp(int iCameraID, unsigned char* pBuffer, long lBuffSize)
 lib.ASIGetDataAfterExp.restype = ctypes.c_int
 lib.ASIGetDataAfterExp.argtypes = [ctypes.c_int, ctypes.POINTER(ctypes.c_ubyte), ctypes.c_long]
-# ================ TO BE DONE ================
+def getDataAfterExp(cameraID, bufferSize):
+    """
+    @brief Get data after exposure
+
+    @note Make sure that the buffer size is big enough
+          to hold an image, otherwise API will crash.
+    
+    @param cameraID   ID of the camera
+    @param bufferSize Buffer to store the data. Its size, in bytes:
+                      8bit mono : width * height
+                      16bit mono: width * height * 2
+                      RGB24     : width * height * 3
+
+    @return Buffer containing the data after exposure
+    """
+    buffer = (ctypes.c_ubyte * bufferSize)()
+    errorCode = lib.ASIGetDataAfterExp(cameraID, buffer, bufferSize)
+    if errorCode != 0:
+        raise ValueError(f"Failed to get data after exposure for cameraID {cameraID}. Error code: {errorCode}")
+    return bytes(buffer)
 
 # Defining ASI_ERROR_CODE ASIGetDataAfterExpGPS(int iCameraID, unsigned char* pBuffer, long lBuffSize, ASI_GPS_DATA *gpsData)
 lib.ASIGetDataAfterExpGPS.restype = ctypes.c_int
