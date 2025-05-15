@@ -553,7 +553,22 @@ def stopExposure(cameraID):
 
 # Defining ASI_ERROR_CODE ASIGetExpStatus(int iCameraID, ASI_EXPOSURE_STATUS *pExpStatus)
 lib.ASIGetExpStatus.restype = ctypes.c_int
-# ============== TO BE DONE ==============
+lib.ASIGetExpStatus.argtypes = [ctypes.c_int, ctypes.POINTER(ctypes.c_int)]
+def getExpStatus(cameraID):
+    """
+    @brief Get snap status
+
+    @note After snap is started, the status should be checked continuously
+
+    @param cameraID ID of the camera
+
+    @return Snap status
+    """
+    expStatus = ctypes.c_int()
+    errorCode = lib.ASIGetExpStatus(cameraID, ctypes.byref(expStatus))
+    if errorCode != 0:
+        raise ValueError(f"Failed to get exposure status for cameraID {cameraID}. Error code: {errorCode}")
+    return expStatus.value
 
 # Defining ASI_ERROR_CODE ASIGetDataAfterExp(int iCameraID, unsigned char* pBuffer, long lBuffSize)
 lib.ASIGetDataAfterExp.restype = ctypes.c_int

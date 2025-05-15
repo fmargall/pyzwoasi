@@ -23,6 +23,12 @@ from.pyzwoasi import (
     startVideoCapture,
     stopVideoCapture,
     getVideoData,
+    startExposure,
+    stopExposure,
+    getExpStatus,
+    getDataAfterExp,
     getSDKVersion,
+    getCameraSupportMode,
+    getCameraMode,
     getSerialNumber
     )
