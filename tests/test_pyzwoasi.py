@@ -477,7 +477,7 @@ class TestASICamera2(unittest.TestCase):
                     finally:
                         # Restore the original ID to avoid side effects
                         setID(cameraInfo.CameraID, originalID)
-                        self.assertEqual(getID(cameraInfo.CameraID), originalID))
+                        self.assertEqual(getID(cameraInfo.CameraID), originalID)
                         closeCamera(cameraInfo.CameraID)
 
         def test_pulseGuide(self):
