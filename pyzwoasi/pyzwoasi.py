@@ -562,7 +562,10 @@ def getExpStatus(cameraID):
 
     @param cameraID ID of the camera
 
-    @return Snap status
+    @return Current snap status, among the following values:
+             - 0: [ASI_SUCCESS] Operation is successful,
+             - 1: [ASI_ERROR_CAMERA_CLOSED] Camera is closed,
+             - 2: [ASI_ERROR_INVALID_ID] No camera with this ID is connected
     """
     expStatus = ctypes.c_int()
     errorCode = lib.ASIGetExpStatus(cameraID, ctypes.byref(expStatus))

@@ -40,8 +40,8 @@ The installer will take in charge the machine configuration and choose the right
 ## Roadmap
 
 <p align="center">
-    <img src=https://geps.dev/progress/81 alt="81%"><br>
-    <sup>Current number of supported ASI SDK v1.37 features: 35/43
+    <img src=https://geps.dev/progress/81 alt="83%"><br>
+    <sup>Current number of supported ASI SDK v1.37 features: 36/43
 </p>
 
 - [x] Add Linux support
