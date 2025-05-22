@@ -1,4 +1,5 @@
 import ctypes
+import enum
 import platform
 import os
 
@@ -16,6 +17,42 @@ else:
     raise ValueError(f"Unsupported system: {system}")
 lib = ctypes.cdll.LoadLibrary(dllPath)
 
+# Defining custom exception type for dll errors
+class ASIError(Exception):
+    def __init__(self, mssg, errorCode):
+        super().__init__(mssg, errorCode, ASIErrorCode(errorCode).name)
+
+# Defining ASI error codes
+class ASIErrorCode(enum.IntEnum):
+    ASI_SUCCESS = 0
+    ASI_ERROR_INVALID_INDEX = enum.auto()  # no camera connected or index value out of boundary
+    ASI_ERROR_INVALID_ID = enum.auto()  # invalid ID
+    ASI_ERROR_INVALID_CONTROL_TYPE = enum.auto()  # invalid control type
+    ASI_ERROR_CAMERA_CLOSED = enum.auto()  # camera didn't open
+    ASI_ERROR_CAMERA_REMOVED = (
+        enum.auto()
+    )  # failed to find the camera, maybe the camera has been removed
+    ASI_ERROR_INVALID_PATH = enum.auto()  # cannot find the path of the file
+    ASI_ERROR_INVALID_FILEFORMAT = enum.auto()
+    ASI_ERROR_INVALID_SIZE = enum.auto()  # wrong video format size
+    ASI_ERROR_INVALID_IMGTYPE = enum.auto()  # unsupported image formate
+    ASI_ERROR_OUT_OF_BOUNDARY = enum.auto()  # the startpos is out of boundary
+    ASI_ERROR_TIMEOUT = enum.auto()  # timeout
+    ASI_ERROR_INVALID_SEQUENCE = enum.auto()  # stop capture first
+    ASI_ERROR_BUFFER_TOO_SMALL = enum.auto()  # buffer size is not big enough
+    ASI_ERROR_VIDEO_MODE_ACTIVE = enum.auto()
+    ASI_ERROR_EXPOSURE_IN_PROGRESS = enum.auto()
+    ASI_ERROR_GENERAL_ERROR = enum.auto()  # general error, eg: value is out of valid range
+    ASI_ERROR_INVALID_MODE = enum.auto()  # the current mode is wrong
+    ASI_ERROR_GPS_NOT_SUPPORTED = enum.auto()  # this camera do not support GPS
+    ASI_ERROR_GPS_VER_ERR = enum.auto()  # the FPGA GPS ver is too low
+    ASI_ERROR_GPS_FPGA_ERR = enum.auto()  # failed to read or write data to FPGA
+    ASI_ERROR_GPS_PARAM_OUT_OF_RANGE = (
+        enum.auto()
+    )  # start line or end line out of range, should make them between 0 ~ MaxHeight - 1
+    ASI_ERROR_GPS_DATA_INVALID = (
+        enum.auto()
+    )  # GPS has not yet found the satellite or FPGA cannot read GPS data
 
 # Defining struct _ASI_CAMERA_INFO
 class CameraInfo(ctypes.Structure):
@@ -148,7 +185,7 @@ def getCameraProperty(cameraIndex):
     cameraInfo = CameraInfo()
     errorCode = lib.ASIGetCameraProperty(cameraInfo, cameraIndex)
     if errorCode != 0:
-        raise ValueError(f"Failed to get camera property. Error code: {errorCode}")
+        raise ASIError(f"Failed to get camera property. Error code: {errorCode}", errorCode)
     return cameraInfo
 
 # Defining ASI_ERROR_CODE ASIGetCameraPropertyByID(int iCameraID, ASI_CAMERA_INFO *pASICameraInfo)
@@ -167,7 +204,7 @@ def getCameraPropertyByID(cameraID):
     cameraInfo = CameraInfo()
     errorCode = lib.ASIGetCameraPropertyByID(cameraID, cameraInfo)
     if errorCode != 0:  
-           raise ValueError(f"Failed to get camera property by ID. Error code: {errorCode}")
+        raise ASIError(f"Failed to get camera property by ID. Error code: {errorCode}", errorCode)
     return cameraInfo
 
 # Defining ASI_ERROR_CODE ASIOpenCamera(int iCameraID)
@@ -181,7 +218,7 @@ def openCamera(cameraID):
     """
     errorCode = lib.ASIOpenCamera(cameraID)
     if errorCode != 0:
-        raise ValueError(f"Failed to open camera. Error code: {errorCode}")
+        raise ASIError(f"Failed to open camera. Error code: {errorCode}", errorCode)
 
 # Defining ASI_ERROR_CODE ASIInitCamera(int iCameraID)
 lib.ASIInitCamera.restype = ctypes.c_int
@@ -196,7 +233,7 @@ def initCamera(cameraID):
     """
     errorCode = lib.ASIInitCamera(cameraID)
     if errorCode != 0:
-        raise ValueError(f"Failed to initialize camera. Error code: {errorCode}")
+        raise ASIError(f"Failed to initialize camera. Error code: {errorCode}", errorCode)
 
 # Defining ASI_ERROR_CODE ASICloseCamera(int iCameraID)
 lib.ASICloseCamera.restype = ctypes.c_int
@@ -209,7 +246,7 @@ def closeCamera(cameraID):
     """
     errorCode = lib.ASICloseCamera(cameraID)
     if errorCode != 0:
-        raise ValueError(f"Failed to close camera. Error code: {errorCode}")
+        raise ASIError(f"Failed to close camera. Error code: {errorCode}", errorCode)
 
 # Defining ASI_ERROR_CODE ASIGetNumOfControls(int iCameraID, int * piNumberOfControls)
 lib.ASIGetNumOfControls.restype = ctypes.c_int
@@ -227,7 +264,7 @@ def getNumOfControls(cameraID):
     pNumOfControls = (ctypes.c_int)() # Pointer used to numOfControls
     errorCode = lib.ASIGetNumOfControls(cameraID, pNumOfControls)
     if errorCode != 0:
-        raise ValueError(f"Failed to get number of controls for cameraID {cameraID}. Error code: {errorCode}")
+        raise ASIError(f"Failed to get number of controls for cameraID {cameraID}. Error code: {errorCode}", errorCode)
     if pNumOfControls.value < 0:
         raise ValueError(f"Number of controls of cameraID {cameraID} cannot be negative ({pNumOfControls})")
     return pNumOfControls.value
@@ -247,7 +284,7 @@ def getControlCaps(cameraID, controlIndex):
     controlCaps = ControlCaps()
     errorCode = lib.ASIGetControlCaps(cameraID, controlIndex, controlCaps)
     if errorCode != 0:
-        raise ValueError(f"Failed to get number of controls for cameraID {cameraID}. Error code: {errorCode}")
+        raise ASIError(f"Failed to get number of controls for cameraID {cameraID}. Error code: {errorCode}", errorCode)
     return controlCaps
 
 # Defining ASI_ERROR_CODE ASIGetControlValue(int iCameraID, ASI_CONTROL_TYPE ControlType, long *plValue, ASI_BOOL *pbAuto)
@@ -267,7 +304,7 @@ def getControlValue(cameraID, controlType):
     autoStatus = ctypes.c_int()
     errorCode = lib.ASIGetControlValue(cameraID, controlType, ctypes.byref(value), ctypes.byref(autoStatus))
     if errorCode != 0:
-        raise ValueError(f"Failed to get control value for cameraID {cameraID}. Error code: {errorCode}")
+        raise ASIError(f"Failed to get control value for cameraID {cameraID}. Error code: {errorCode}", errorCode)
     return value.value, autoStatus.value == 1
 
 # Defining ASI_ERROR_CODE ASISetControlValue(int iCameraID, ASI_CONTROL_TYPE  ControlType, long lValue, ASI_BOOL bAuto)
@@ -286,7 +323,7 @@ def setControlValue(cameraID, controlType, value, auto):
     """
     errorCode = lib.ASISetControlValue(cameraID, controlType, value, auto)
     if errorCode != 0:
-        raise ValueError(f"Failed to set control value for cameraID {cameraID}. Error code: {errorCode}")
+        raise ASIError(f"Failed to set control value for cameraID {cameraID}. Error code: {errorCode}", errorCode)
 
 # Defining ASI_ERROR_CODE ASIGetROIFormat(int iCameraID, int *piWidth, int *piHeight, int *piBin, ASI_IMG_TYPE *pImg_type)
 lib.ASIGetROIFormat.restype = ctypes.c_int
@@ -310,7 +347,7 @@ def getROIFormat(cameraID):
     imgType = ctypes.c_int()
     errorCode = lib.ASIGetROIFormat(cameraID, ctypes.byref(width), ctypes.byref(height), ctypes.byref(binning), ctypes.byref(imgType))
     if errorCode != 0:
-        raise ValueError(f"Failed to get ROI format for cameraID {cameraID}. Error code: {errorCode}")
+        raise ASIError(f"Failed to get ROI format for cameraID {cameraID}. Error code: {errorCode}", errorCode)
     return width.value, height.value, binning.value, imgType.value
 
 # Defining ASI_ERROR_CODE ASISetROIFormat(int iCameraID, int iWidth, int iHeight, int iBin, ASI_IMG_TYPE Img_type)
@@ -331,7 +368,7 @@ def setROIFormat(cameraID, width, height, binning, imgType):
     """
     errorCode = lib.ASISetROIFormat(cameraID, width, height, binning, imgType)
     if errorCode != 0:
-        raise ValueError(f"Failed to set ROI format for cameraID {cameraID}. Error code: {errorCode}")
+        raise ASIError(f"Failed to set ROI format for cameraID {cameraID}. Error code: {errorCode}", errorCode)
 
 # Defining ASI_ERROR_CODE ASIGetStartPos(int iCameraID, int *piStartX, int *piStartY)
 lib.ASIGetStartPos.restype = ctypes.c_int
@@ -349,7 +386,7 @@ def getStartPos(cameraID):
     startY = ctypes.c_int()
     errorCode = lib.ASIGetStartPos(cameraID, ctypes.byref(startX), ctypes.byref(startY))
     if errorCode != 0:
-        raise ValueError(f"Failed to get start position for cameraID {cameraID}. Error code: {errorCode}")
+        raise ASIError(f"Failed to get start position for cameraID {cameraID}. Error code: {errorCode}", errorCode)
     return startX.value, startY.value
 
 # Defining ASI_ERROR_CODE ASISetStartPos(int iCameraID, int iStartX, int iStartY)
@@ -365,7 +402,7 @@ def setStartPos(cameraID, startX, startY):
     """
     errorCode = lib.ASISetStartPos(cameraID, startX, startY)
     if errorCode != 0:
-        raise ValueError(f"Failed to set start position for cameraID {cameraID}. Error code: {errorCode}")
+        raise ASIError(f"Failed to set start position for cameraID {cameraID}. Error code: {errorCode}", errorCode)
 
 # Defining ASI_ERROR_CODE ASIGetDroppedFrames(int iCameraID,int *piDropFrames)
 lib.ASIGetDroppedFrames.restype = ctypes.c_int
@@ -384,7 +421,7 @@ def getDroppedFrames(cameraID):
     droppedFrames = ctypes.c_int()
     errorCode = lib.ASIGetDroppedFrames(cameraID, ctypes.byref(droppedFrames))
     if errorCode != 0:
-        raise ValueError(f"Failed to get dropped frames for cameraID {cameraID}. Error code: {errorCode}")
+        raise ASIError(f"Failed to get dropped frames for cameraID {cameraID}. Error code: {errorCode}", errorCode)
     return droppedFrames.value
 
 # Defining ASI_ERROR_CODE ASIEnableDarkSubtract(int iCameraID, char *pcBMPPath)
@@ -406,7 +443,7 @@ def enableDarkSubtract(cameraID, bmpPath):
     """
     errorCode = lib.ASIEnableDarkSubtract(cameraID, bmpPath.encode('utf-8'))
     if errorCode != 0:
-        raise ValueError(f"Failed to enable dark subtract for cameraID {cameraID}. Error code: {errorCode}")
+        raise ASIError(f"Failed to enable dark subtract for cameraID {cameraID}. Error code: {errorCode}", errorCode)
 
 # Defining ASI_ERROR_CODE ASIDisableDarkSubtract(int iCameraID)
 lib.ASIDisableDarkSubtract.restype = ctypes.c_int
@@ -422,7 +459,7 @@ def disableDarkSubtract(cameraID):
     """
     errorCode = lib.ASIDisableDarkSubtract(cameraID)
     if errorCode != 0:
-        raise ValueError(f"Failed to disable dark subtract for cameraID {cameraID}. Error code: {errorCode}")
+        raise ASIError(f"Failed to disable dark subtract for cameraID {cameraID}. Error code: {errorCode}", errorCode)
 
 # Defining ASI_ERROR_CODE ASIStartVideoCapture(int iCameraID)
 lib.ASIStartVideoCapture.restype = ctypes.c_int
@@ -435,7 +472,7 @@ def startVideoCapture(cameraID):
     """
     errorCode = lib.ASIStartVideoCapture(cameraID)
     if errorCode != 0:
-        raise ValueError(f"Failed to start video capture for cameraID {cameraID}. Error code: {errorCode}")
+        raise ASIError(f"Failed to start video capture for cameraID {cameraID}. Error code: {errorCode}", errorCode)
 
 # Defining ASI_ERROR_CODE ASIStopVideoCapture(int iCameraID)
 lib.ASIStopVideoCapture.restype = ctypes.c_int
@@ -448,7 +485,7 @@ def stopVideoCapture(cameraID):
     """
     errorCode = lib.ASIStopVideoCapture(cameraID)
     if errorCode != 0:
-        raise ValueError(f"Failed to stop video capture for cameraID {cameraID}. Error code: {errorCode}")
+        raise ASIError(f"Failed to stop video capture for cameraID {cameraID}. Error code: {errorCode}", errorCode)
 
 # Defining ASI_ERROR_CODE ASIGetVideoData(int iCameraID, unsigned char* pBuffer, long lBuffSize, int iWaitms)
 lib.ASIGetVideoData.restype = ctypes.c_int
@@ -478,7 +515,7 @@ def getVideoData(cameraID, bufferSize, waitms):
     buffer = (ctypes.c_ubyte * bufferSize)()
     errorCode = lib.ASIGetVideoData(cameraID, buffer, bufferSize, waitms)
     if errorCode != 0:
-        raise ValueError(f"Failed to get video data for cameraID {cameraID}. Error code: {errorCode}")
+        raise ASIError(f"Failed to get video data for cameraID {cameraID}. Error code: {errorCode}", errorCode)
     return bytes(buffer)
 
 # Defining ASI_ERROR_CODE ASIGetVideoDataGPS(int iCameraID, unsigned char* pBuffer, long lBuffSize, int iWaitms, ASI_GPS_DATA *gpsData)
@@ -501,7 +538,7 @@ def pulseGuideOn(cameraID, direction):
     """
     errorCode = lib.ASIPulseGuideOn(cameraID, direction)
     if errorCode != 0:
-        raise ValueError(f"Failed to pulse guide on for cameraID {cameraID}. Error code: {errorCode}")
+        raise ASIError(f"Failed to pulse guide on for cameraID {cameraID}. Error code: {errorCode}", errorCode)
 
 # Defining ASI_ERROR_CODE ASIPulseGuideOff(int iCameraID, ASI_GUIDE_DIRECTION direction)
 lib.ASIPulseGuideOff.restype = ctypes.c_int
@@ -519,7 +556,7 @@ def pulseGuideOff(cameraID, direction):
     """
     errorCode = lib.ASIPulseGuideOff(cameraID, direction)
     if errorCode != 0:
-        raise ValueError(f"Failed to pulse guide off for cameraID {cameraID}. Error code: {errorCode}")
+        raise ASIError(f"Failed to pulse guide off for cameraID {cameraID}. Error code: {errorCode}", errorCode)
 
 # Defining ASI_ERROR_CODE ASIStartExposure(int iCameraID, ASI_BOOL bIsDark)
 lib.ASIStartExposure.restype = ctypes.c_int
@@ -536,7 +573,7 @@ def startExposure(cameraID, isDark):
     """
     errorCode = lib.ASIStartExposure(cameraID, 1 if isDark else 0)
     if errorCode != 0:
-        raise ValueError(f"Failed to start exposure for cameraID {cameraID}. Error code: {errorCode}")
+        raise ASIError(f"Failed to start exposure for cameraID {cameraID}. Error code: {errorCode}", errorCode)
 
 # Defining ASI_ERROR_CODE ASIStopExposure(int iCameraID)
 lib.ASIStopExposure.restype = ctypes.c_int
@@ -549,7 +586,7 @@ def stopExposure(cameraID):
     """
     errorCode = lib.ASIStopExposure(cameraID)
     if errorCode != 0:
-        raise ValueError(f"Failed to stop exposure for cameraID {cameraID}. Error code: {errorCode}")
+        raise ASIError(f"Failed to stop exposure for cameraID {cameraID}. Error code: {errorCode}", errorCode)
 
 # Defining ASI_ERROR_CODE ASIGetExpStatus(int iCameraID, ASI_EXPOSURE_STATUS *pExpStatus)
 lib.ASIGetExpStatus.restype = ctypes.c_int
@@ -570,7 +607,7 @@ def getExpStatus(cameraID):
     expStatus = ctypes.c_int()
     errorCode = lib.ASIGetExpStatus(cameraID, ctypes.byref(expStatus))
     if errorCode != 0:
-        raise ValueError(f"Failed to get exposure status for cameraID {cameraID}. Error code: {errorCode}")
+        raise ASIError(f"Failed to get exposure status for cameraID {cameraID}. Error code: {errorCode}", errorCode)
     return expStatus.value
 
 # Defining ASI_ERROR_CODE ASIGetDataAfterExp(int iCameraID, unsigned char* pBuffer, long lBuffSize)
@@ -594,7 +631,7 @@ def getDataAfterExp(cameraID, bufferSize):
     buffer = (ctypes.c_ubyte * bufferSize)()
     errorCode = lib.ASIGetDataAfterExp(cameraID, buffer, bufferSize)
     if errorCode != 0:
-        raise ValueError(f"Failed to get data after exposure for cameraID {cameraID}. Error code: {errorCode}")
+        raise ASIError(f"Failed to get data after exposure for cameraID {cameraID}. Error code: {errorCode}", errorCode)
     return bytes(buffer)
 
 # Defining ASI_ERROR_CODE ASIGetDataAfterExpGPS(int iCameraID, unsigned char* pBuffer, long lBuffSize, ASI_GPS_DATA *gpsData)
@@ -617,7 +654,7 @@ def getID(cameraID):
     cameraIDStruct = ID()
     errorCode = lib.ASIGetID(cameraID, ctypes.byref(cameraIDStruct))
     if errorCode != 0:
-        raise ValueError(f"Failed to get ID for cameraID {cameraID}. Error code: {errorCode}")
+        raise ASIError(f"Failed to get ID for cameraID {cameraID}. Error code: {errorCode}", errorCode)
     return cameraIDStruct
 
 # Defining ASI_ERROR_CODE ASISetID(int iCameraID, ASI_ID ID)
@@ -634,7 +671,7 @@ def setID(cameraID, newCameraID):
     """
     errorCode = lib.ASISetID(cameraID, id)
     if errorCode != 0:
-        raise ValueError(f"Failed to set ID for cameraID {cameraID}. Error code: {errorCode}")
+        raise ASIError(f"Failed to set ID for cameraID {cameraID}. Error code: {errorCode}", errorCode)
 
 # Defining ASI_ERROR_CODE ASIGetGainOffset(int iCameraID, int *pOffset_HighestDR, int *pOffset_UnityGain, int *pGain_LowestRN, int *pOffset_LowestRN)
 lib.ASIGetGainOffset.restype = ctypes.c_int
@@ -681,7 +718,7 @@ def getCameraSupportMode(cameraID):
     supportedMode = SupportedMode()
     errorCode = lib.ASIGetCameraSupportMode(cameraID, ctypes.byref(supportedMode))
     if errorCode != 0:
-        raise ValueError(f"Failed to get camera support mode for cameraID {cameraID}. Error code: {errorCode}")
+        raise ASIError(f"Failed to get camera support mode for cameraID {cameraID}. Error code: {errorCode}", errorCode)
     return supportedMode
 
 # Defining ASI_ERROR_CODE ASIGetCameraMode(int iCameraID, ASI_CAMERA_MODE* mode)
@@ -704,7 +741,7 @@ def getCameraMode(cameraID):
     cameraMode = ctypes.c_int()
     errorCode = lib.ASIGetCameraMode(cameraID, ctypes.byref(cameraMode))
     if errorCode != 0:
-        raise ValueError(f"Failed to get camera mode for cameraID {cameraID}. Error code: {errorCode}")
+        raise ASIError(f"Failed to get camera mode for cameraID {cameraID}. Error code: {errorCode}", errorCode)
     return cameraMode.value
 
 # Defining ASI_ERROR_CODE ASISetCameraMode(int iCameraID, ASI_CAMERA_MODE mode)
@@ -725,7 +762,7 @@ def setCameraMode(cameraID, cameraMode):
     """
     errorCode = lib.ASISetCameraMode(cameraID, cameraMode)
     if errorCode != 0:
-        raise ValueError(f"Failed to set camera mode for cameraID {cameraID}. Error code: {errorCode}")
+        raise ASIError(f"Failed to set camera mode for cameraID {cameraID}. Error code: {errorCode}", errorCode)
 
 # Defining ASI_ERROR_CODE ASISendSoftTrigger(int iCameraID, ASI_BOOL bStart)
 lib.ASISendSoftTrigger.restype = ctypes.c_int
@@ -739,7 +776,7 @@ def sendSoftTrigger(cameraID, start):
     """
     errorCode = lib.ASISendSoftTrigger(cameraID, 1 if start else 0)
     if errorCode != 0:
-        raise ValueError(f"Failed to send soft trigger for cameraID {cameraID}. Error code: {errorCode}")
+        raise ASIError(f"Failed to send soft trigger for cameraID {cameraID}. Error code: {errorCode}", errorCode)
 
 # Defining ASIGetSerialNumber(int iCameraID, ASI_SN* pSN)
 lib.ASIGetSerialNumber.argtypes = [ctypes.c_int, ctypes.POINTER(SN)]
@@ -756,7 +793,7 @@ def getSerialNumber(cameraID):
     errorCode = lib.ASIGetSerialNumber(cameraID, ctypes.byref(serialNumber))
 
     if errorCode != 0:
-        raise ValueError(f"Failed to get serial number of cameraID {cameraID}. Error code: {errorCode}")
+        raise ASIError(f"Failed to get serial number of cameraID {cameraID}. Error code: {errorCode}", errorCode)
 
     return ''.join(f"{b:02X}" for b in serialNumber.SN)
 
