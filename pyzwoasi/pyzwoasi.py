@@ -24,35 +24,29 @@ class ASIError(Exception):
 
 # Defining ASI error codes
 class ASIErrorCode(enum.IntEnum):
-    ASI_SUCCESS = 0
-    ASI_ERROR_INVALID_INDEX = enum.auto()  # no camera connected or index value out of boundary
-    ASI_ERROR_INVALID_ID = enum.auto()  # invalid ID
-    ASI_ERROR_INVALID_CONTROL_TYPE = enum.auto()  # invalid control type
-    ASI_ERROR_CAMERA_CLOSED = enum.auto()  # camera didn't open
-    ASI_ERROR_CAMERA_REMOVED = (
-        enum.auto()
-    )  # failed to find the camera, maybe the camera has been removed
-    ASI_ERROR_INVALID_PATH = enum.auto()  # cannot find the path of the file
-    ASI_ERROR_INVALID_FILEFORMAT = enum.auto()
-    ASI_ERROR_INVALID_SIZE = enum.auto()  # wrong video format size
-    ASI_ERROR_INVALID_IMGTYPE = enum.auto()  # unsupported image formate
-    ASI_ERROR_OUT_OF_BOUNDARY = enum.auto()  # the startpos is out of boundary
-    ASI_ERROR_TIMEOUT = enum.auto()  # timeout
-    ASI_ERROR_INVALID_SEQUENCE = enum.auto()  # stop capture first
-    ASI_ERROR_BUFFER_TOO_SMALL = enum.auto()  # buffer size is not big enough
-    ASI_ERROR_VIDEO_MODE_ACTIVE = enum.auto()
-    ASI_ERROR_EXPOSURE_IN_PROGRESS = enum.auto()
-    ASI_ERROR_GENERAL_ERROR = enum.auto()  # general error, eg: value is out of valid range
-    ASI_ERROR_INVALID_MODE = enum.auto()  # the current mode is wrong
-    ASI_ERROR_GPS_NOT_SUPPORTED = enum.auto()  # this camera do not support GPS
-    ASI_ERROR_GPS_VER_ERR = enum.auto()  # the FPGA GPS ver is too low
-    ASI_ERROR_GPS_FPGA_ERR = enum.auto()  # failed to read or write data to FPGA
-    ASI_ERROR_GPS_PARAM_OUT_OF_RANGE = (
-        enum.auto()
-    )  # start line or end line out of range, should make them between 0 ~ MaxHeight - 1
-    ASI_ERROR_GPS_DATA_INVALID = (
-        enum.auto()
-    )  # GPS has not yet found the satellite or FPGA cannot read GPS data
+    ASI_SUCCESS                      = 0
+    ASI_ERROR_INVALID_INDEX          = enum.auto() # no camera connected or index value out of boundary
+    ASI_ERROR_INVALID_ID             = enum.auto() # invalid ID
+    ASI_ERROR_INVALID_CONTROL_TYPE   = enum.auto() # invalid control type
+    ASI_ERROR_CAMERA_CLOSED          = enum.auto() # camera didn't open
+    ASI_ERROR_CAMERA_REMOVED         = enum.auto() # failed to find the camera, maybe the camera has been removed
+    ASI_ERROR_INVALID_PATH           = enum.auto() # cannot find the path of the file
+    ASI_ERROR_INVALID_FILEFORMAT     = enum.auto()
+    ASI_ERROR_INVALID_SIZE           = enum.auto() # wrong video format size
+    ASI_ERROR_INVALID_IMGTYPE        = enum.auto() # unsupported image formate
+    ASI_ERROR_OUT_OF_BOUNDARY        = enum.auto() # the startpos is out of boundary
+    ASI_ERROR_TIMEOUT                = enum.auto() # timeout
+    ASI_ERROR_INVALID_SEQUENCE       = enum.auto() # stop capture first
+    ASI_ERROR_BUFFER_TOO_SMALL       = enum.auto() # buffer size is not big enough
+    ASI_ERROR_VIDEO_MODE_ACTIVE      = enum.auto()
+    ASI_ERROR_EXPOSURE_IN_PROGRESS   = enum.auto()
+    ASI_ERROR_GENERAL_ERROR          = enum.auto() # general error, eg: value is out of valid range
+    ASI_ERROR_INVALID_MODE           = enum.auto() # the current mode is wrong
+    ASI_ERROR_GPS_NOT_SUPPORTED      = enum.auto() # this camera do not support GPS
+    ASI_ERROR_GPS_VER_ERR            = enum.auto() # the FPGA GPS ver is too low
+    ASI_ERROR_GPS_FPGA_ERR           = enum.auto() # failed to read or write data to FPGA
+    ASI_ERROR_GPS_PARAM_OUT_OF_RANGE = enum.auto() # start line or end line out of range, should make them between 0 ~ MaxHeight - 1
+    ASI_ERROR_GPS_DATA_INVALID       = enum.auto() # GPS has not yet found the satellite or FPGA cannot read GPS data
 
 # Defining struct _ASI_CAMERA_INFO
 class CameraInfo(ctypes.Structure):

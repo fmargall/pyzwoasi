@@ -40,15 +40,22 @@ The installer will take in charge the machine configuration and choose the right
 ## Roadmap
 
 <p align="center">
-    <img src=https://geps.dev/progress/81 alt="83%"><br>
+    <img src=https://geps.dev/progress/83 alt="83%"><br>
     <sup>Current number of supported ASI SDK v1.37 features: 36/43
 </p>
 
 - [x] Add Linux support
 - [x] Add MacOS support
 - [ ] Add Android support
-- [ ] Add more precise error handling
+- [x] Add more precise error handling
 - [ ] Add missing functions from the ZWO ASI SDK
+  - [ ] Add function `ASIGetVideoDataGPS`
+  - [ ] Add function `ASIGetDataAfterExpGPS`
+  - [ ] Add function `getGainOffset`
+  - [ ] Add function `ASIGetLMHGainOffset`
+  - [ ] Add function `ASISetTriggerOutputIOConf`
+  - [ ] Add function `ASIGetTriggerOutputIOConf`
+  - [ ] Add function `ASIGPSGetData`
 
 If you have any wishes, suggestions, comments or advice, please feel free to [create an issue](https://github.com/fmargall/pyzwoasi/issues) or contact me directly.
 
@@ -69,6 +76,12 @@ This Python project will also be a test of different codings metrics and tools t
 
 ## License
 Distributed under the MIT License. See `LICENSE.txt` for more information.
+
+## Contributors
+
+<a href="https://github.com/fmargall/pyzwoasi/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=fmargall/pyzwoasi" />
+</a>
 
 ## Contact
 François Margall - fr.margall@proton.me
