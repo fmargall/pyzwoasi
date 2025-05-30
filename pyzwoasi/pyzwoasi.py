@@ -663,7 +663,7 @@ def setID(cameraID, newCameraID):
     @param cameraID    ID of the camera
     @param newCameraID New ID to set for the camera
     """
-    errorCode = lib.ASISetID(cameraID, id)
+    errorCode = lib.ASISetID(cameraID, newCameraID)
     if errorCode != 0:
         raise ASIError(f"Failed to set ID for cameraID {cameraID}. Error code: {errorCode}", errorCode)
 
@@ -672,8 +672,30 @@ lib.ASIGetGainOffset.restype = ctypes.c_int
 lib.ASIGetGainOffset.argtypes = [ctypes.c_int, ctypes.POINTER(ctypes.c_int), ctypes.POINTER(ctypes.c_int), ctypes.POINTER(ctypes.c_int), ctypes.POINTER(ctypes.c_int)]
 def getGainOffset(cameraID):
     """
+    @brief Gets the gain and offset pre-setting parameters values for the camera
+
+    @param cameraID ID of the camera
+
+    @return Tuple containing:
+             - offsetHighestDR: Offset for the highest dynamic range
+             - offsetUnityGain: Offset for the unity gain
+             - gainLowestRN   : Gain for the lowest read noise
+             - offsetLowestRN : Offset for the lowest read noise
     """
-# ============== TO BE DONE ==============
+    offsetHighestDR = ctypes.c_int()
+    offsetUnityGain = ctypes.c_int()
+    gainLowestRN    = ctypes.c_int()
+    offsetLowestRN  = ctypes.c_int()
+
+    errorCode = lib.ASIGetGainOffset(cameraID, 
+                                     ctypes.byref(offsetHighestDR), 
+                                     ctypes.byref(offsetUnityGain), 
+                                     ctypes.byref(gainLowestRN)   , 
+                                     ctypes.byref(offsetLowestRN) )
+    if errorCode != 0:
+        raise ASIError(f"Failed to get gain/offset for cameraID {cameraID}. Error code: {errorCode}", errorCode)
+
+    return (offsetHighestDR.value, offsetUnityGain.value, gainLowestRN.value, offsetLowestRN.value)
 
 # Defining ASI_ERROR_CODE ASIGetLMHGainOffset(int iCameraID, int* pLGain, int* pMGain, int* pHGain, int* pHOffset)
 lib.ASIGetLMHGainOffset.restype = ctypes.c_int
