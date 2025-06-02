@@ -702,8 +702,29 @@ lib.ASIGetLMHGainOffset.restype = ctypes.c_int
 lib.ASIGetLMHGainOffset.argtypes = [ctypes.c_int, ctypes.POINTER(ctypes.c_int), ctypes.POINTER(ctypes.c_int), ctypes.POINTER(ctypes.c_int), ctypes.POINTER(ctypes.c_int)]
 def getLMHGainOffset(cameraID):
     """
+    @brief Gets the frequently-used gain and offset pre-setting parameters values for the camera
+
+    @param cameraID ID of the camera
+
+    @return Tuple containing:
+             - lGain  : Low gain value
+             - mGain  : Medium gain value
+             - hGain  : High gain value (gain at the lowest read noise)
+             - hOffset: High offset value
     """
-# ================ TO BE DONE ================
+    lGain   = ctypes.c_int()
+    mGain   = ctypes.c_int()
+    hGain   = ctypes.c_int()
+    hOffset = ctypes.c_int()
+    errorCode = lib.ASIGetLMHGainOffset(cameraID, 
+                                        ctypes.byref(lGain), 
+                                        ctypes.byref(mGain), 
+                                        ctypes.byref(hGain), 
+                                        ctypes.byref(hOffset))
+    if errorCode != 0:
+        raise ASIError(f"Failed to get LMH gain/offset for cameraID {cameraID}. Error code: {errorCode}", errorCode)
+    
+    return (lGain.value, mGain.value, hGain.value, hOffset.value)
 
 # Defining char* ASIGetSDKVersion()
 lib.ASIGetSDKVersion.restype = ctypes.c_char_p
