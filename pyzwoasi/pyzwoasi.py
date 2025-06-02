@@ -816,8 +816,8 @@ def sendSoftTrigger(cameraID, start):
         raise ASIError(f"Failed to send soft trigger for cameraID {cameraID}. Error code: {errorCode}", errorCode)
 
 # Defining ASIGetSerialNumber(int iCameraID, ASI_SN* pSN)
-lib.ASIGetSerialNumber.argtypes = [ctypes.c_int, ctypes.POINTER(SN)]
 lib.ASIGetSerialNumber.restype = ctypes.c_int
+lib.ASIGetSerialNumber.argtypes = [ctypes.c_int, ctypes.POINTER(SN)]
 def getSerialNumber(cameraID):
     """
     @brief Gets the serial number of the camera
@@ -840,7 +840,37 @@ lib.ASISetTriggerOutputIOConf.restype = ctypes.c_int
 
 # Defining ASI_ERROR_CODE ASIGetTriggerOutputIOConf(int iCameraID, ASI_TRIG_OUTPUT_PIN pin, ASI_BOOL *bPinHigh, long *lDelay, long *lDuration)
 lib.ASIGetTriggerOutputIOConf.restype = ctypes.c_int
-# =================== TO BE DONE ===================
+lib.ASIGetTriggerOutputIOConf.argtypes = [ctypes.c_int, ctypes.c_int, ctypes.POINTER(ctypes.c_int), ctypes.POINTER(ctypes.c_long), ctypes.POINTER(ctypes.c_long)]
+def getTriggerOutputIOConf(cameraID, pin):
+    """
+    @brief Gets the trigger output IO pin configuration
+
+    @param cameraID ID of the camera
+    @param pin      Trigger output pin to get the configuration of, should be one of the following:
+                    -  0 for pin A output only
+                    -  1 for pin B output only
+                    - -1 for none
+    
+    @return Tuple containing:
+             - bPinHigh: True if the pin outputs a high level as a valid signal, False otherwise
+             - delay   : Delay in microseconds between trigger and output
+             - duration: Duration in microseconds of the valid output level
+
+    @note Should be called only when IsTriggerCam in CameraInfo is true.
+    """
+    bPinHigh  = ctypes.c_int()
+    lDelay    = ctypes.c_long()
+    lDuration = ctypes.c_long()
+
+    errorCode = lib.ASIGetTriggerOutputIOConf(cameraID, pin,
+                                              ctypes.byref(bPinHigh),
+                                              ctypes.byref(lDelay),
+                                              ctypes.byref(lDuration))
+
+    if errorCode != 0:
+        raise ASIError(f"Failed to get trigger output IO configuration for cameraID {cameraID}. Error code: {errorCode}", errorCode)
+
+    return (bPinHigh.value == 1, lDelay.value, lDuration.value)
 
 # Defining ASI_ERROR_CODE ASIGPSGetData(int iCameraID, ASI_GPS_DATA* startLineGPSData, ASI_GPS_DATA* endLineGPSData)
 lib.ASIGPSGetData.restype = ctypes.c_int

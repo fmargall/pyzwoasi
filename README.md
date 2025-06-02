@@ -40,8 +40,8 @@ The installer will take in charge the machine configuration and choose the right
 ## Roadmap
 
 <p align="center">
-    <img src=https://geps.dev/progress/88 alt="88%"><br>
-    <sup>Current number of supported ASI SDK v1.37 features: 38/43
+    <img src=https://geps.dev/progress/90 alt="90%"><br>
+    <sup>Current number of supported ASI SDK v1.37 features: 39/43
 </p>
 
 - [x] Add Linux support
@@ -52,7 +52,6 @@ The installer will take in charge the machine configuration and choose the right
   - [ ] Add function `ASIGetVideoDataGPS`
   - [ ] Add function `ASIGetDataAfterExpGPS`
   - [ ] Add function `ASISetTriggerOutputIOConf`
-  - [ ] Add function `ASIGetTriggerOutputIOConf`
   - [ ] Add function `ASIGPSGetData`
 
 If you have any wishes, suggestions, comments or advice, please feel free to [create an issue](https://github.com/fmargall/pyzwoasi/issues) or contact me directly.

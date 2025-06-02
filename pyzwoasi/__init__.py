@@ -34,5 +34,6 @@ from.pyzwoasi import (
     getSDKVersion,
     getCameraSupportMode,
     getCameraMode,
-    getSerialNumber
+    getSerialNumber,
+    getTriggerOutputIOConf
     )
