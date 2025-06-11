@@ -836,7 +836,25 @@ def getSerialNumber(cameraID):
 
 # Defining ASI_ERROR_CODE ASISetTriggerOutputIOConf(int iCameraID, ASI_TRIG_OUTPUT_PIN pin, ASI_BOOL bPinHigh, long lDelay, long lDuration)
 lib.ASISetTriggerOutputIOConf.restype = ctypes.c_int
-# =================== TO BE DONE ===================
+lib.ASISetTriggerOutputIOConf.argtypes = [ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_long, ctypes.c_long]
+def setTriggerOutputIOConf(cameraID, pin, bPinHigh, delay, duration):
+    """
+    @brief Sets the trigger output IO pin configuration
+
+    @param cameraID ID of the camera
+    @param pin      Trigger output pin to set the configuration of. This should be one of the
+                    following:
+                     -  0 for pin A output only
+                     -  1 for pin B output only
+                     - -1 for none
+    @param bPinHigh Boolean indicating if the pin should output a high level as a valid signal
+    @param delay    Delay in microseconds between trigger and output. From 0 to 2000*1000*1000
+    @param duration Duration in microseconds of the valid output level. Once again goes from 0
+                    to 2000*1000*1000.
+    """
+    errorCode = lib.ASISetTriggerOutputIOConf(cameraID, pin, 1 if bPinHigh else 0, delay, duration)
+    if errorCode != 0:
+        raise ASIError(f"Failed to set trigger output IO configuration for cameraID {cameraID}. Error code: {errorCode}", errorCode)
 
 # Defining ASI_ERROR_CODE ASIGetTriggerOutputIOConf(int iCameraID, ASI_TRIG_OUTPUT_PIN pin, ASI_BOOL *bPinHigh, long *lDelay, long *lDuration)
 lib.ASIGetTriggerOutputIOConf.restype = ctypes.c_int
