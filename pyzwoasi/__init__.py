@@ -1,7 +1,7 @@
 from .__version__ import __version__
 
 from.pyzwoasi import (
-    CameraInfo, ControlCaps, DateTime, ID, SN,
+    CameraInfo, ControlCaps, DateTime, GPSData, ID, SN,
     getNumOfConnectedCameras,
     getProductIDs,
     cameraCheck,

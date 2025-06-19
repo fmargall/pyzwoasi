@@ -101,6 +101,17 @@ class DateTime(ctypes.Structure):
         ("Unused" , ctypes.c_char * 64) 
     ]
 
+# Defining struct _ASI_GPS_DATA
+class GPSData(ctypes.Structure):
+    _fields_ = [
+        ("DateTime"    , DateTime),
+        ("Latitude"    , ctypes.c_double), # Latitude in degrees , positive for North, negative for South
+        ("Longitude"   , ctypes.c_double), # Longitude in degrees, positive for East , negative for West
+        ("Altitude"    , ctypes.c_int),    # Altitude (minimum unit is 0.1 m) (maximum number is 99999)
+        ("SatelliteNum", ctypes.c_int),    # Maximum number is 99
+        ("Unused"      , ctypes.c_char * 64)
+    ]
+
 # Defining struct _ASI_ID
 class ID(ctypes.Structure):
     _fields_ = [
