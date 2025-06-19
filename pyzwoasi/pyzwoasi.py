@@ -87,6 +87,20 @@ class ControlCaps(ctypes.Structure):
         ("Unused"         , ctypes.c_char * 32)
     ]
 
+# Defining struct _ASI_DATE_TIME
+class DateTime(ctypes.Structure):
+    _fields_ = [
+        ("Year"   , ctypes.c_int),
+        ("Month"  , ctypes.c_int),
+        ("Day"    , ctypes.c_int),
+        ("Hour"   , ctypes.c_int),
+        ("Minute" , ctypes.c_int),
+        ("Second" , ctypes.c_int),
+        ("Msecond", ctypes.c_int),
+        ("Usecond", ctypes.c_int),
+        ("Unused" , ctypes.c_char * 64) 
+    ]
+
 # Defining struct _ASI_ID
 class ID(ctypes.Structure):
     _fields_ = [
