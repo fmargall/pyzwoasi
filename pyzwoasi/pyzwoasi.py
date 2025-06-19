@@ -539,6 +539,7 @@ def getVideoData(cameraID, bufferSize, waitms):
 
 # Defining ASI_ERROR_CODE ASIGetVideoDataGPS(int iCameraID, unsigned char* pBuffer, long lBuffSize, int iWaitms, ASI_GPS_DATA *gpsData)
 lib.ASIGetVideoDataGPS.restype = ctypes.c_int
+lib.ASIGetVideoDataGPS.argtypes = [ctypes.c_int, ctypes.POINTER(ctypes.c_ubyte), ctypes.c_long, ctypes.c_int, ctypes.POINTER(GPSData)]
 # =============== TO BE DONE ===============
 
 # Defining ASI_ERROR_CODE ASIPulseGuideOn(int iCameraID, ASI_GUIDE_DIRECTION direction)
@@ -655,6 +656,7 @@ def getDataAfterExp(cameraID, bufferSize):
 
 # Defining ASI_ERROR_CODE ASIGetDataAfterExpGPS(int iCameraID, unsigned char* pBuffer, long lBuffSize, ASI_GPS_DATA *gpsData)
 lib.ASIGetDataAfterExpGPS.restype = ctypes.c_int
+lib.ASIGetDataAfterExpGPS.argtypes = [ctypes.c_int, ctypes.POINTER(ctypes.c_ubyte), ctypes.c_long, ctypes.POINTER(GPSData)]
 # ================= TO BE DONE =================
 
 # Defining ASI_ERROR_CODE ASIGetID(int iCameraID, ASI_ID* pID)
@@ -917,4 +919,5 @@ def getTriggerOutputIOConf(cameraID, pin):
 
 # Defining ASI_ERROR_CODE ASIGPSGetData(int iCameraID, ASI_GPS_DATA* startLineGPSData, ASI_GPS_DATA* endLineGPSData)
 lib.ASIGPSGetData.restype = ctypes.c_int
+lib.ASIGPSGetData.argtypes = [ctypes.c_int, ctypes.POINTER(GPSData), ctypes.POINTER(GPSData)]
 # ============= TO BE DONE =============
