@@ -1,6 +1,7 @@
 from .__version__ import __version__
 
 from.pyzwoasi import (
+    ASIError, ASIErrorCode, ASIExposureStatus,
     CameraInfo, ControlCaps, DateTime, GPSData, ID, SN,
     getNumOfConnectedCameras,
     getProductIDs,

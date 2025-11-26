@@ -48,6 +48,13 @@ class ASIErrorCode(enum.IntEnum):
     ASI_ERROR_GPS_PARAM_OUT_OF_RANGE = enum.auto() # start line or end line out of range, should make them between 0 ~ MaxHeight - 1
     ASI_ERROR_GPS_DATA_INVALID       = enum.auto() # GPS has not yet found the satellite or FPGA cannot read GPS data
 
+# Defining ASI Exposure Status
+class ASIExposureStatus(enum.IntEnum):
+    ASI_EXP_IDLE    = 0           # Idle state, exposure can be started
+    ASI_EXP_WORKING = enum.auto() # Exposure in progress
+    ASI_EXP_SUCCESS = enum.auto() # Exposure over, waiting for download
+    ASI_EXP_FAILED  = enum.auto() # Exposure failed should be restarted
+
 # Defining struct _ASI_CAMERA_INFO
 class CameraInfo(ctypes.Structure):
     _fields_ = [
@@ -628,7 +635,7 @@ def getExpStatus(cameraID):
     errorCode = lib.ASIGetExpStatus(cameraID, ctypes.byref(expStatus))
     if errorCode != 0:
         raise ASIError(f"Failed to get exposure status for cameraID {cameraID}. Error code: {errorCode}", errorCode)
-    return expStatus.value
+    return ASIExposureStatus(expStatus.value)
 
 # Defining ASI_ERROR_CODE ASIGetDataAfterExp(int iCameraID, unsigned char* pBuffer, long lBuffSize)
 lib.ASIGetDataAfterExp.restype = ctypes.c_int
