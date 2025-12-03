@@ -98,7 +98,7 @@ class ControlCaps(ctypes.Structure):
         ("DefaultValue"   , ctypes.c_long),
         ("IsAutoSupported", ctypes.c_int),        # Support auto is 1, don't support 0
         ("IsWritable"     , ctypes.c_int),        # Some control like temperature can only be read by some cameras 
-        ("ControlType"    , ctypes.c_int),        #  used to get value and set value of the control
+        ("ControlType"    , ctypes.c_int),        # Used to get value and set value of the control
         ("Unused"         , ctypes.c_char * 32)
     ]
 
@@ -465,7 +465,7 @@ def enableDarkSubtract(cameraID, bmpPath):
     """
     @brief Enables the dark subtract function from a dark BMP file
 
-    @note Used when there is hot pixel or wheb long exposure is needed.
+    @note Used when there is hot pixel or when long exposure is needed.
            Dark file should be made from the "dark subtract" function of
            the "video capture filter" directshow page.
            Dark file's size should be the same of camera's max width and
@@ -537,9 +537,9 @@ def getVideoData(cameraID, bufferSize, waitms):
 
     @param cameraID   ID of the camera
     @param bufferSize Buffer to store the video data. Its size, in bytes:
-                      8bit mono : width * height
+                      8 bit mono: width * height
                       16bit mono: width * height * 2
-                      RGB24     : width * height * 3
+                      24bit RGB : width * height * 3
     @param waitms     Time to wait for the data in milliseconds, -1 for
                       infinite.  Recommended value is set to exposure *
                       2 + 500 ms
