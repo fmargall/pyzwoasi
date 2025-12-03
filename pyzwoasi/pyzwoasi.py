@@ -382,7 +382,7 @@ def getROIFormat(cameraID):
     errorCode = lib.ASIGetROIFormat(cameraID, ctypes.byref(width), ctypes.byref(height), ctypes.byref(binning), ctypes.byref(imgType))
     if errorCode != 0:
         raise ASIError(f"Failed to get ROI format for cameraID {cameraID}. Error code: {errorCode}", errorCode)
-    return width.value, height.value, binning.value, imgType.value
+    return width.value, height.value, binning.value, ASIImageType(imgType.value)
 
 # Defining ASI_ERROR_CODE ASISetROIFormat(int iCameraID, int iWidth, int iHeight, int iBin, ASI_IMG_TYPE Img_type)
 lib.ASISetROIFormat.restype = ctypes.c_int
