@@ -47,8 +47,6 @@ class ZWOCamera:
             self._dictControlIDMin[controlName] = controlCaps.MinValue
             self._dictControlIDMax[controlName] = controlCaps.MaxValue
 
-            print("Control:", controlName)
-
             # Initialize both the exposure time and image type with default values
             if controlName == "Exposure"  : self.exposure  = controlCaps.DefaultValue
             if controlName == "Image Type": self.imageType = controlCaps.DefaultValue
