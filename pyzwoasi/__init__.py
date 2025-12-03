@@ -1,6 +1,6 @@
 from .__version__ import __version__
 
-from.pyzwoasi import (
+from .pyzwoasi import (
     ASIError, ASIErrorCode, ASIExposureStatus,
     CameraInfo, ControlCaps, DateTime, GPSData, ID, SN,
     getNumOfConnectedCameras,
@@ -38,4 +38,7 @@ from.pyzwoasi import (
     getSerialNumber,
     getTriggerOutputIOConf,
     getTriggerOutputIOConf
-    )
+)
+
+# High-level convenience class
+from .camera import ZWOCamera

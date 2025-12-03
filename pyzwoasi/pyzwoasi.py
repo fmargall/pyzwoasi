@@ -466,11 +466,11 @@ def enableDarkSubtract(cameraID, bmpPath):
     @brief Enables the dark subtract function from a dark BMP file
 
     @note Used when there is hot pixel or when long exposure is needed.
-           Dark file should be made from the "dark subtract" function of
-           the "video capture filter" directshow page.
-           Dark file's size should be the same of camera's max width and
-           height and should be RGB8 raw format. It will stay on even if 
-           the ROI settings are modified.
+          Dark file should be made from the "dark subtract" function of
+          the "video capture filter" directshow page.
+          Dark file's size should be the same of camera's max width and
+          height and should be RGB8 raw format. It will stay on even if 
+          the ROI settings are modified.
 
     @param cameraID ID of the camera
     @param bmpPath  Path to the BMP file used for dark substraction
