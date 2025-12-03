@@ -15,7 +15,7 @@ class ZWOCamera:
         self._isClosed = False
 
         # Let's get some information about the chosen camera
-        cameraInfo = pyzwoasi.getCameraProperty(cameraIndex)
+        cameraInfo = pyzwoasi.getCameraProperty(self._cameraIndex)
 
         self._name                 = cameraInfo.Name.decode('utf-8')
         self._cameraID             = cameraInfo.CameraID
@@ -323,43 +323,43 @@ class ZWOCamera:
         cv2.createTrackbar("ROI"      , windowName, 100, 100, lambda x: None)
 
         # It is useless to go above 1 second exposure for live view testing
-        maximumExposureLimit = np.minimum(camera.exposureLimits[1], 1000)
+        maximumExposureLimit = np.minimum(self.exposureLimits[1], 1000)
 
         # Software binning does not change latence or FPS in live view
-        camera.softwareBinning = 1
+        self.softwareBinning = 1
 
         previousTime = time.time()
-        camera.startVideoCapture()
+        self.startVideoCapture()
         while True:
             # Updating camera exposure
             exposureTime_percentage = cv2.getTrackbarPos("Exposure", windowName)
-            exposureTime_us = (camera.exposureLimits[0] + (maximumExposureLimit - camera.exposureLimits[0]) * exposureTime_percentage / 100)
-            camera.exposure = int(exposureTime_us)
+            exposureTime_us = (self.exposureLimits[0] + (maximumExposureLimit - self.exposureLimits[0]) * exposureTime_percentage / 100)
+            self.exposure = int(exposureTime_us)
 
             # Updating camera gain
             gain_percentage = cv2.getTrackbarPos("Gain", windowName)
-            cameraGainMin, cameraGainMax = camera._dictControlIDMin["Gain"], camera._dictControlIDMax["Gain"]
+            cameraGainMin, cameraGainMax = self._dictControlIDMin["Gain"], self._dictControlIDMax["Gain"]
             gain = int(cameraGainMin + (cameraGainMax - cameraGainMin) * gain_percentage / 100)
-            camera.gain = gain
+            self.gain = gain
 
             roiPercentage = np.maximum(1, cv2.getTrackbarPos("ROI", windowName))
 
-            width  = (int(camera._maxWidth  * (roiPercentage / 100) / camera.softwareBinning) // 8) * 8
-            height = (int(camera._maxHeight * (roiPercentage / 100) / camera.softwareBinning) // 2) * 2
+            width  = (int(self._maxWidth  * (roiPercentage / 100) / self.softwareBinning) // 8) * 8
+            height = (int(self._maxHeight * (roiPercentage / 100) / self.softwareBinning) // 2) * 2
 
-            widthBeforeUpdate, heighBeforeUpdate, _, _ = pyzwoasi.getROIFormat(cameraIndex)
+            widthBeforeUpdate, heighBeforeUpdate, _, _ = pyzwoasi.getROIFormat(self._cameraIndex)
 
             if (width != widthBeforeUpdate) or (height != heighBeforeUpdate):
-                camera.stopVideoCapture()
-                camera.setROI(width, height)
-                camera.startVideoCapture()
+                self.stopVideoCapture()
+                self.setROI(width, height)
+                self.startVideoCapture()
 
             # Getting image from camera and displaying it
             try:
                 # As given by the manufacturer ZWO, the refresh rate should
                 # be at least twice the exposure time plus 500 microseconds
                 refreshRate = int(2 * exposureTime_us + 500)
-                frame = pyzwoasi.getVideoData(camera._cameraIndex, camera.bufferSize, refreshRate)
+                frame = pyzwoasi.getVideoData(self._cameraIndex, self.bufferSize, refreshRate)
             except ASIError as e:
                 print(f"Error getting video data: {e}")
                 continue
