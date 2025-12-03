@@ -9,6 +9,10 @@ description = "Python binding for the ZWO ASI SDK library"
 authors = [
 	{ name = "Francois Margall", email = "fr.margall@proton.me" },
 ]
+dependencies = [
+	"numpy",
+	"opencv-python",
+]
 readme = "README.md"
 keywords = ["binding", "zwo", "asi", "sdk", "wrapper", "camera", "astronomy"]
 classifiers = [
