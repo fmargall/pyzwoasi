@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools >= 64", "setuptools-scm >= 8"]
+requires = ["setuptools >= 64", "setuptools-git-versioning >= 2.0, < 3"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -30,5 +30,15 @@ Repository = "https://github.com/fmargall/pyzwoasi.git"
 where = ["."]
 include = ["pyzwoasi*"]
 
-[tool.setuptools.dynamic]
-version = {attr = "pyzwoasi.__version__"}
+[tool.setuptools.package-data]
+pyzwoasi = [
+    "lib/Windows/x64/ASICamera2.dll",
+    "lib/Windows/x86/ASICamera2.dll",
+    "lib/Linux/x64/libASICamera2.so.1.37",
+    "lib/Linux/x86/libASICamera2.so.1.37",
+    "lib/MacOS/libASICamera2.dylib.1.37"
+]
+
+[tool.setuptools-git-versioning]
+enabled = true
+dirty_template = "{tag}"

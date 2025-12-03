@@ -1,5 +1,3 @@
-from .__version__ import __version__
-
 from .pyzwoasi import (
     ASIError, ASIErrorCode, ASIExposureStatus,
     CameraInfo, ControlCaps, DateTime, GPSData, ID, SN,
@@ -42,3 +40,9 @@ from .pyzwoasi import (
 
 # High-level convenience class
 from .camera import ZWOCamera
+
+from importlib.metadata import version, PackageNotFoundError
+try:
+    __version__ = version("pyzwoasi")
+except PackageNotFoundError:
+    __version__ = "?.?.?"
