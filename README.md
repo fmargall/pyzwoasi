@@ -6,7 +6,7 @@ PyZWOASI is a Python binding for the ZWO ASI SDK. It is developped to be easy-to
 
 <p align="center">
   <a href="https://www.zwoastro.com/software/">
-    <img src="https://img.shields.io/badge/Supported_ASI_SDK_Version-1.37-blue" alt="Supported ASI SDK version : 1.37">
+    <img src="https://img.shields.io/badge/Supported_ASI_SDK_Version-1.4-blue" alt="Supported ASI SDK version : 1.4">
   </a>
 </p>
 
