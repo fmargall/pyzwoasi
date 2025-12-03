@@ -48,6 +48,14 @@ class ASIErrorCode(enum.IntEnum):
     ASI_ERROR_GPS_PARAM_OUT_OF_RANGE = enum.auto() # start line or end line out of range, should make them between 0 ~ MaxHeight - 1
     ASI_ERROR_GPS_DATA_INVALID       = enum.auto() # GPS has not yet found the satellite or FPGA cannot read GPS data
 
+# Defining ASI image types
+class ASIImageType(enum.IntEnum):
+    ASI_IMG_RAW8   = 0           #      RAW image,  8 bits per pixel
+    ASI_IMG_RGB24  = enum.auto() #      RGB image, 24 bits per pixel
+    ASI_IMG_RAW16  = enum.auto() #      RAW image, 16 bits per pixel
+    ASI_IMG_Y8     = enum.auto() # Y (mono) image,  8 bits per pixel
+    ASI_IMG_END    = enum.auto() #   End of image type
+
 # Defining ASI Exposure Status
 class ASIExposureStatus(enum.IntEnum):
     ASI_EXP_IDLE    = 0           # Idle state, exposure can be started
