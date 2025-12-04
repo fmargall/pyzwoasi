@@ -2,82 +2,110 @@
 
 # PyZWOASI &middot; <img src="https://github.com/fmargall/pyzwoasi/actions/workflows/deployment.yml/badge.svg" alt="Build status"> <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="MIT License"> <a href="https://github.com/qoomon/starlines"> <img src="https://starlines.qoo.monster/assets/fmargall/pyzwoasi" align="right" alt="Starline counter"/> </a>
 
-PyZWOASI is a Python binding for the ZWO ASI SDK. It is developped to be easy-to-use and functional, and, if I can make it, up-to-date.
+## Overview
 
-<p align="center">
-  <a href="https://www.zwoastro.com/software/">
-    <img src="https://img.shields.io/badge/Supported_ASI_SDK_Version-1.4-blue" alt="Supported ASI SDK version : 1.4">
-  </a>
-</p>
+PyZWOASI is a lightweight, cross-platform Python binding for the ZWO ASI SDK, allowing you to control and stream data from all ZWO ASI USB cameras directly from Python.
 
-Currently compatible with Windows, Linux and MacOS.
+The project provides:
 
-<p align="center">
-  <a href="https://www.microsoft.com/windows/">
-    <img src="https://img.shields.io/badge/Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white" alt="Windows compatible">
-  </a> 
-  &ensp;
-  <a href="https://www.kernel.org/">
-    <img src="https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black" alt="Linux compatible">
-  </a>
-  &ensp;
-  <a href="https://www.apple.com/macos/">
-    <img src="https://img.shields.io/badge/MacOS-000000?style=for-the-badge&logo=apple&logoColor=white" alt="MacOS compatible">
-  </a>
-</p>
+- A low-level ctypes wrapper exposing all original SDK functions
+- Full support for exposure, ROI, binning, video capture, etc.
+- Cross-platform DLL/SO/Dylib loading (Windows / Linux / macOS)
+- Example scripts for live view
+
+It is designed to be simple to use for beginners, while remaining powerful enough for advanced users who require direct access to the underlying SDK.
+
+## Features
+
+- [x] Easy-to-use Python interface class for ZWO ASI cameras `ZWOCamera`
+- [x] Live-view with real-time frame display using `OpenCV` 
+- [ ] Direct access to all ZWO ASI SDK functions (40 / 43)
+   - [ ] Add function `ASIGetVideoDataGPS`
+   - [ ] Add function `ASIGetDataAfterExpGPS`
+   - [ ] Add function `ASIGPSGetData`
+- [x] Cross-platform support (Windows, Linux, MacOS)
 
 ## Installation
 
-The safest and simplest way to install `pyzwoasi` is to use its repository from PyPI using `pip` : 
+### (Recommended) Using pip
 
+The safest and easiest way to install up-to-date PyZWOASI is to use its repository from PyPI using `pip` :
+```bash
+pip install pyzwoasi
 ```
-python -m pip install --upgrade pip
-python -m pip install pyzwoasi
+
+The installer will take in charge the machine configuration and choose the right compiled library files from ZWO. This means that you will not have useless `.dll` files on your machine, only the needed ones.
+
+> [!NOTE]
+> Only installation from `pip` is currently supported. Installation from `conda` or other package managers is not available at the moment but will come. If you do not want to use `pip`, please follow the instructions below to install from source.
+
+### (Alternative) From source
+
+If you want to be part of the development or simply if you want to install the module directly from the sources, you can also clone the repository and run pip from there:
+```bash
+git clone https://github.com/fmargall/pyzwoasi.git
+cd pyzwoasi
+pip install -e .
 ```
 
-The installer will take in charge the machine configuration and choose the right compiled library file from ZWO. You will not have useless `.dll` files on your machine, only the needed ones.
+## Quick start
 
-## Roadmap
+### First shot
 
-<p align="center">
-    <img src=https://geps.dev/progress/93 alt="93%"><br>
-    <sup>Current number of supported ASI SDK v1.37 features: 40/43
-</p>
+```python
+import pyzwoasi
 
-- [x] Add Linux support
-- [x] Add MacOS support
-- [ ] Add Android support
-- [x] Add more precise error handling
-- [ ] Add missing functions from the ZWO ASI SDK
-  - [ ] Add function `ASIGetVideoDataGPS`
-  - [ ] Add function `ASIGetDataAfterExpGPS`
-  - [ ] Add function `ASIGPSGetData`
+numOfConnectedCameras = pyzwoasi.getNumOfConnectedCameras()
+if (numOfConnectedCameras == 0):
+    print("No camera connected")
+    exit()
 
-If you have any wishes, suggestions, comments or advice, please feel free to [create an issue](https://github.com/fmargall/pyzwoasi/issues) or contact me directly.
+for cameraIndex in range(numOfConnectedCameras):
+    with ZWOCamera(cameraIndex) as camera:
+        imageData = camera.shot(exposureTime_us = 1000) 
+```
 
-### Code quality
+### Live view
 
-This Python project will also be a test of different codings metrics and tools to ensure its quality and security. This part is more a personal challenge and journey into new metrics and Python tools.
+```python
+import pyzwoasi
 
-- [ ] Computing code coverage using `coverage`
-- [ ] Static code analysis using `pylint`
-- [ ] Style guide enforcement using `black` or `flake8`
-- [ ] Writing a Git best practices charter for the project (atomic commits and explicits like `feat:`, `fix:`, `refactor:` and so on. More about this about [here](https://medium.com/@noriller/docs-conventional-commits-feat-fix-refactor-which-is-which-531614fcb65a) and [here](https://www.conventionalcommits.org/en/v1.0.0/))
-- [ ] Writing a security charter, using `bandit` and `safety` to ensure the code is secure
-- [ ] Making large documentation using `sphinx`, `readthedocs` and proposing metrics with `docstr-coverage`
-- [ ] Profiling the code with `cProfile` and `line_profiler`
-- [ ] Various other code metrics with `radon` and `mccabe`
-- [ ] Adding build status badges and SonarQube badges
-- [ ] and lots of other things proposed by [other repos](https://github.com/dwyl/repo-badges)
+numOfConnectedCameras = pyzwoasi.getNumOfConnectedCameras()
+if (numOfConnectedCameras == 0):
+    print("No camera connected")
+    exit()
 
-## License
-Distributed under the MIT License. See `LICENSE.txt` for more information.
+for cameraIndex in range(numOfConnectedCameras):
+    with ZWOCamera(cameraIndex) as camera:
+        camera.liveView()
+```
 
-## Contributors
+## Advanced usage
+
+### High-level access (ZWOCamera class)
+
+The `ZWOCamera` class provides a high-level interface to interact with ZWO ASI cameras. It encapsulates common operations such as connecting to the camera, capturing images, and starting live view sessions.
+
+### Low-level access (Direct SDK function calls)
+
+For advanced applications or scientific control, you can call the original ASI SDK functions directly. This is identical to the official C API, just wrapped for Python.
+
+## Contributing
+
+Contributions are welcome! Whether you fix a bug, improve documentation, add support for new SDK functions, or propose new high-level APIs, feel free to open an issue or submit a pull request. 
+Please follow the existing coding style and keep the project cross-platform.
+
+### Contributors
 
 <a href="https://github.com/fmargall/pyzwoasi/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=fmargall/pyzwoasi" />
 </a>
 
-## Contact
+
+### Contact
+
 François Margall - fr.margall@proton.me
+
+## License
+
+PyZWOASI is distributed under the MIT License. See `LICENSE.txt` for more information.
