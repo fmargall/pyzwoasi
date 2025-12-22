@@ -28,7 +28,9 @@ It is designed to be simple to use for beginners, while remaining powerful enoug
 ## Installation
 
 > [!WARNING]
-> If you are working on Windows, the ZWO USB driver must be installed on the system before the module can detect any camera. You can download the latest driver from the [ZWO website > Software > Dekstop App > Windows > Camera Driver](https://www.zwoastro.com/software/). If you are on Linux or MacOS, no additional driver installation is needed.
+> - Windows: install the ZWO USB driver from [ZWO website > Software > Desktop App > Windows > Camera Driver](https://www.zwoastro.com/software/) before using the module.
+> - macOS: libusb is required. Install via Homebrew: `brew install libusb`.
+> - Linux: libusb is typically already available via your distribution packages.
 
 ### (Recommended) Using pip
 
@@ -57,6 +59,7 @@ pip install -e .
 
 ```python
 import pyzwoasi
+from pyzwoasi import ZWOCamera
 
 numOfConnectedCameras = pyzwoasi.getNumOfConnectedCameras()
 if (numOfConnectedCameras == 0):
@@ -72,6 +75,7 @@ for cameraIndex in range(numOfConnectedCameras):
 
 ```python
 import pyzwoasi
+from pyzwoasi import ZWOCamera
 
 numOfConnectedCameras = pyzwoasi.getNumOfConnectedCameras()
 if (numOfConnectedCameras == 0):
@@ -97,7 +101,7 @@ For advanced applications or scientific control, you can call the original ASI S
 
 <details>
 <summary>Why is my camera not detected?</summary>
-If you are on Windows, make sure you have installed the ZWO ASI Camera driver, as explained in the Installation section of this README. If this is the case or if you are on Linux or MacOS, most of the time the problem comes from a bad USB port or cable. Please try to change USB port and/or cable, especially if you are using a USB cable extension, try to remove it.
+If you are on Windows, make sure you have installed the ZWO ASI Camera driver, as explained in the Installation section of this README. On macOS, ensure `libusb` is installed (`brew install libusb`). If this is the case or if you are on Linux or MacOS, most of the time the problem comes from a bad USB port or cable. Please try to change USB port and/or cable, especially if you are using a USB cable extension, try to remove it.
 </details>
 
 ## Contributing

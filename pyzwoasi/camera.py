@@ -43,7 +43,7 @@ class ZWOCamera:
         for controlIndex in range(numOfControls):
             controlCaps = pyzwoasi.getControlCaps(self._cameraIndex, controlIndex)
             controlName = controlCaps.Name.decode('utf-8')
-            self._dictControlID[controlName] = controlIndex
+            self._dictControlID[controlName] = controlCaps.ControlType
             self._dictControlIDMin[controlName] = controlCaps.MinValue
             self._dictControlIDMax[controlName] = controlCaps.MaxValue
 

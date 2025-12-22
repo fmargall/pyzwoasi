@@ -10,9 +10,12 @@ arch = platform.architecture()[0]
 if   system == 'Windows':
     dllPath = os.path.join(os.path.dirname(__file__), 'lib', system, 'x64' if arch == '64bit' else 'x86', 'ASICamera2.dll')
 elif system == 'Linux':
-    dllPath = os.path.join(os.path.dirname(__file__), 'lib', system, 'x64' if arch == '64bit' else 'x86', 'libASICamera2.so.1.37')
+    dllPath = os.path.join(os.path.dirname(__file__), 'lib', system, 'x64' if arch == '64bit' else 'x86', 'libASICamera2.so.1.40')
 elif system == 'Darwin':
-    dllPath = os.path.join(os.path.dirname(__file__), 'lib', 'MacOS', 'libASICamera2.dylib.1.37')
+    machine = platform.machine().lower()
+    is_arm = machine.startswith('arm') or machine.startswith('aarch64')
+    macos_base = os.path.join(os.path.dirname(__file__), 'lib', 'MacOS')
+    dllPath = os.path.join(macos_base, 'arm64', 'libASICamera2.dylib.1.40') if is_arm else os.path.join(macos_base, 'x86_64', 'libASICamera2.dylib.1.40')
 else:
     raise ValueError(f"Unsupported system: {system}")
 lib = ctypes.cdll.LoadLibrary(dllPath)
