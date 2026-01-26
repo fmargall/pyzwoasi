@@ -92,7 +92,7 @@ class ZWOCamera:
                 print("Exposure control not available for this camera.")
         else:
             raise ValueError(f"Exposure time out of range. Selected value is {exposureTime_us} and range "
-                       f"is [{self._dictControlIDMin["Exposure"]}, {self._dictControlIDMax["Exposure"]}].")
+                           f"is [{self._dictControlMin['Exposure']}, {self._dictControlMax['Exposure']}].")
 
     @property
     def exposureLimits(self):
@@ -119,7 +119,7 @@ class ZWOCamera:
                 print("Gain control not available for this camera.")
         else:
             raise ValueError(f"Gain value out of range. Selected value is {gainValue} and range "
-                      f"is [{self._dictControlIDMin["Gain"]}, {self._dictControlIDMax["Gain"]}].")
+                          f"is [{self._dictControlMin['Gain']}, {self._dictControlMax['Gain']}].")
 
     @property
     def softwareBinning(self):
@@ -157,7 +157,7 @@ class ZWOCamera:
                 print("Hardware binning control not available for this camera.")
         else:
             raise ValueError(f"Hardware binning value out of range. Selected value is {hardwareBinningArg} and range "
-                             f"is [{self._dictControlIDMin["HardwareBin"]}, {self._dictControlIDMax["HardwareBin"]}].")
+                             f"is [{self._dictControlMin['HardwareBin']}, {self._dictControlMax['HardwareBin']}].")
 
     @property
     def hardwareBinningLimits(self):
@@ -218,7 +218,7 @@ class ZWOCamera:
                     pyzwoasi.setControlValue(self._cameraIndex, self._dictControlID["BandWidth"], bandwidthValue, auto=False)
             else:
                 raise ValueError(f"Bandwidth value out of range. Selected value is {bandwidthValue} and range "
-                          f"is [{self._dictControlIDMin["BandWidth"]}, {self._dictControlIDMax["BandWidth"]}].")
+                              f"is [{self._dictControlMin['BandWidth']}, {self._dictControlMax['BandWidth']}].")
         except KeyError:
             print("Bandwidth control not available for this camera.")
 
