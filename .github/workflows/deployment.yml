@@ -26,7 +26,6 @@ jobs:
           pip install pytest
       - run: pytest -q
 
-jobs:
   build:
     needs: [tests]
     runs-on: ubuntu-latest
