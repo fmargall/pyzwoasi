@@ -145,7 +145,7 @@ class TestASICamera2(unittest.TestCase):
         def test_getSDKVersion(self):
             sdkVersion = getSDKVersion()
             self.assertIsInstance(sdkVersion, str)
-            self.assertEqual(sdkVersion, "1, 37, 0, 0") # Current version of the SDK
+            self.assertEqual(sdkVersion, "1, 41, 0, 0") # Current version of the SDK
 
         def test_sendSoftTrigger(self):
             numCameras = getNumOfConnectedCameras()
