@@ -225,6 +225,57 @@ class ZWOCamera:
             print("Bandwidth control not available for this camera.")
 
     """
+    @brief Returns the current sensor temperature, in degrees Celsius.
+    """
+    @property
+    def temperature(self):
+        try:
+            # ZWO ASI SDK always returns the current sensor temperature in degrees Celsius with a 10 factor
+            return 0.1 * pyzwoasi.getControlValue(self._cameraIndex, self._dictControlType["Temperature"])[0]
+        except KeyError:
+            print("Sensor temperature not available for this camera.")
+            return None
+
+    @property
+    def cooler(self):
+        try:
+            return pyzwoasi.getControlValue(self._cameraIndex, self._dictControlType["CoolerOn"])[0]
+        except KeyError:
+            print("Cooler not available for this camera.")
+            return None
+
+    @cooler.setter
+    def cooler(self, coolerOnOff: bool):
+        try:
+            controlCaps = pyzwoasi.getControlCaps(self._cameraIndex, self._dictControlID["CoolerOn"])
+            if controlCaps.IsWritable == False:
+                print("Cooler not writable for this camera.")
+                return
+
+            if self._dictControlMin["CoolerOn"] <= coolerOnOff <= self._dictControlMax["CoolerOn"]:
+                    pyzwoasi.setControlValue(self._cameraIndex, self._dictControlType["CoolerOn"], coolerOnOff, auto=False)
+            else:
+                raise ValueError(f"Cooler on/off value out of range. Selected value is {coolerOnOff} and range "
+                                 f"is [{self._dictControlMin['CoolerOn']}, {self._dictControlMax['CoolerOn']}].")
+        except KeyError:
+            print("Cooler not available for this camera.")
+
+    def targetTemperature(self, temperature):
+        try:
+            controlCaps = pyzwoasi.getControlCaps(self._cameraIndex, self._dictControlID["TargetTemp"])
+            if controlCaps.IsWritable == False:
+                print("Target temperature writable for this camera.")
+                return
+
+            if self._dictControlMin["TargetTemp"] <= temperature <= self._dictControlMax["TargetTemp"]:
+                    pyzwoasi.setControlValue(self._cameraIndex, self._dictControlType["TargetTemp"], temperature, auto=False)
+            else:
+                raise ValueError(f"Target temperature value out of range. Selected value is {temperature} and range "
+                                 f"is [{self._dictControlMin['TargetTemp']}, {self._dictControlMax['TargetTemp']}].")
+        except KeyError:
+            print("Target temperature not available for this camera.")
+
+    """
     @brief Take a single picture with the camera.
 
     The following arguments are optional, and if not provided,
