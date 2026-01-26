@@ -37,15 +37,17 @@ class ZWOCamera:
 
         # Read and save all camera controls for the getters/setters.
         numOfControls = pyzwoasi.getNumOfControls(self._cameraIndex)
-        self._dictControlID = {}
-        self._dictControlIDMin = {}
-        self._dictControlIDMax = {}
+        self._dictControlID   = {}
+        self._dictControlMin  = {}
+        self._dictControlMax  = {}
+        self._dictControlType = {}
         for controlIndex in range(numOfControls):
             controlCaps = pyzwoasi.getControlCaps(self._cameraIndex, controlIndex)
             controlName = controlCaps.Name.decode('utf-8')
-            self._dictControlID[controlName] = controlCaps.ControlType
-            self._dictControlIDMin[controlName] = controlCaps.MinValue
-            self._dictControlIDMax[controlName] = controlCaps.MaxValue
+            self._dictControlID [controlName]  = controlIndex
+            self._dictControlMin[controlName]  = controlCaps.MinValue
+            self._dictControlMax[controlName]  = controlCaps.MaxValue
+            self._dictControlType[controlName] = controlCaps.ControlType
 
             # Initialize both the exposure time and image type with default values
             if controlName == "Exposure"  : self.exposure  = controlCaps.DefaultValue
@@ -78,16 +80,16 @@ class ZWOCamera:
     @property
     def exposure(self):
         try:
-            return pyzwoasi.getControlValue(self._cameraIndex, self._dictControlID["Exposure"])[0]
+            return pyzwoasi.getControlValue(self._cameraIndex, self._dictControlType["Exposure"])[0]
         except KeyError:
             print("Exposure control not available for this camera.")
             return None
 
     @exposure.setter
     def exposure(self, exposureTime_us):
-        if self._dictControlIDMin["Exposure"] <= exposureTime_us <= self._dictControlIDMax["Exposure"]:
+        if self._dictControlMin["Exposure"] <= exposureTime_us <= self._dictControlMax["Exposure"]:
             try:
-                pyzwoasi.setControlValue(self._cameraIndex, self._dictControlID["Exposure"], exposureTime_us, auto=False)
+                pyzwoasi.setControlValue(self._cameraIndex, self._dictControlType["Exposure"], exposureTime_us, auto=False)
             except KeyError:
                 print("Exposure control not available for this camera.")
         else:
@@ -97,7 +99,7 @@ class ZWOCamera:
     @property
     def exposureLimits(self):
         try:
-            return (self._dictControlIDMin["Exposure"], self._dictControlIDMax["Exposure"])
+            return (self._dictControlMin["Exposure"], self._dictControlMax["Exposure"])
         except KeyError:
             print("Exposure control not available for this camera.")
             return (None, None)
@@ -105,16 +107,16 @@ class ZWOCamera:
     @property
     def gain(self):
         try:
-            return pyzwoasi.getControlValue(self._cameraIndex, self._dictControlID["Gain"])[0]
+            return pyzwoasi.getControlValue(self._cameraIndex, self._dictControlType["Gain"])[0]
         except KeyError:
             print("Gain control not available for this camera.")
             return None
 
     @gain.setter
     def gain(self, gainValue):
-        if self._dictControlIDMin["Gain"] <= gainValue <= self._dictControlIDMax["Gain"]:
+        if self._dictControlMin["Gain"] <= gainValue <= self._dictControlMax["Gain"]:
             try:
-                pyzwoasi.setControlValue(self._cameraIndex, self._dictControlID["Gain"], gainValue, auto=False)
+                pyzwoasi.setControlValue(self._cameraIndex, self._dictControlType["Gain"], gainValue, auto=False)
             except KeyError:
                 print("Gain control not available for this camera.")
         else:
@@ -137,21 +139,21 @@ class ZWOCamera:
     @property
     def hardwareBinning(self):
         try:
-            return pyzwoasi.getControlValue(self._cameraIndex, self._dictControlID["HardwareBin"])[0]
+            return pyzwoasi.getControlValue(self._cameraIndex, self._dictControlType["HardwareBin"])[0]
         except KeyError:
             print("Hardware binning control not available for this camera.")
             return None
 
     @hardwareBinning.setter
     def hardwareBinning(self, hardwareBinningArg):
-        if self._dictControlIDMin["HardwareBin"] <= hardwareBinningArg <= self._dictControlIDMax["HardwareBin"]:
+        if self._dictControlMin["HardwareBin"] <= hardwareBinningArg <= self._dictControlMax["HardwareBin"]:
             try:
                 controlCaps = pyzwoasi.getControlCaps(self._cameraIndex, self._dictControlID["HardwareBin"])
                 if controlCaps.IsWritable == False:
                     print("Hardware binning control not writable for this camera.")
                     return
 
-                pyzwoasi.setControlValue(self._cameraIndex, self._dictControlID["HardwareBin"], hardwareBinningArg, auto=False)
+                pyzwoasi.setControlValue(self._cameraIndex, self._dictControlType["HardwareBin"], hardwareBinningArg, auto=False)
 
             except KeyError:
                 print("Hardware binning control not available for this camera.")
@@ -162,7 +164,7 @@ class ZWOCamera:
     @property
     def hardwareBinningLimits(self):
         try:
-            return (self._dictControlIDMin["HardwareBin"], self._dictControlIDMax["HardwareBin"])
+            return (self._dictControlMin["HardwareBin"], self._dictControlMax["HardwareBin"])
         except KeyError:
             print("Hardware binning control not available for this camera.")
             return (None, None)
@@ -186,7 +188,7 @@ class ZWOCamera:
     @property
     def highSpeedMode(self):
         try:
-            return pyzwoasi.getControlValue(self._cameraIndex, self._dictControlID["HighSpeedMode"])[0]
+            return pyzwoasi.getControlValue(self._cameraIndex, self._dictControlType["HighSpeedMode"])[0]
         except KeyError:
             print("High Speed Mode control not available for this camera.")
             return None
@@ -194,14 +196,14 @@ class ZWOCamera:
     @highSpeedMode.setter
     def highSpeedMode(self, mode):
         try:
-            pyzwoasi.setControlValue(self._cameraIndex, self._dictControlID["HighSpeedMode"], mode, auto=False)
+            pyzwoasi.setControlValue(self._cameraIndex, self._dictControlType["HighSpeedMode"], mode, auto=False)
         except KeyError:
             print("High Speed Mode control not available for this camera.")
 
     @property
     def bandwidth(self):
         try:
-            return pyzwoasi.getControlValue(self._cameraIndex, self._dictControlID["BandWidth"])[0]
+            return pyzwoasi.getControlValue(self._cameraIndex, self._dictControlType["BandWidth"])[0]
         except KeyError:
             print("Bandwidth control not available for this camera.")
             return None
@@ -214,8 +216,8 @@ class ZWOCamera:
                 print("Bandwidth control not writable for this camera.")
                 return
 
-            if self._dictControlIDMin["BandWidth"] <= bandwidthValue <= self._dictControlIDMax["BandWidth"]:
-                    pyzwoasi.setControlValue(self._cameraIndex, self._dictControlID["BandWidth"], bandwidthValue, auto=False)
+            if self._dictControlMin["BandWidth"] <= bandwidthValue <= self._dictControlMax["BandWidth"]:
+                    pyzwoasi.setControlValue(self._cameraIndex, self._dictControlType["BandWidth"], bandwidthValue, auto=False)
             else:
                 raise ValueError(f"Bandwidth value out of range. Selected value is {bandwidthValue} and range "
                               f"is [{self._dictControlMin['BandWidth']}, {self._dictControlMax['BandWidth']}].")
@@ -336,7 +338,7 @@ class ZWOCamera:
 
             # Updating camera gain
             gain_percentage = cv2.getTrackbarPos("Gain", windowName)
-            cameraGainMin, cameraGainMax = self._dictControlIDMin["Gain"], self._dictControlIDMax["Gain"]
+            cameraGainMin, cameraGainMax = self._dictControlMin["Gain"], self._dictControlMax["Gain"]
             gain = int(cameraGainMin + (cameraGainMax - cameraGainMin) * gain_percentage / 100)
             self.gain = gain
 
