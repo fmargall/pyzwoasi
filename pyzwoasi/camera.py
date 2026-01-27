@@ -194,7 +194,7 @@ class ZWOCamera:
             return None
 
     @highSpeedMode.setter
-    def highSpeedMode(self, mode):
+    def highSpeedMode(self, mode: bool):
         try:
             pyzwoasi.setControlValue(self._cameraIndex, self._dictControlType["HighSpeedMode"], mode, auto=False)
         except KeyError:
