@@ -53,6 +53,7 @@ class ZWOCamera:
             if controlName == "Exposure"  : self.exposure  = controlCaps.DefaultValue
             if controlName == "Image Type": self.imageType = controlCaps.DefaultValue
 
+            # If the cooler can be controlled, it will always be set on
     @property
     def imageType(self):
         _, _, _, imageType = pyzwoasi.getROIFormat(self._cameraIndex)
