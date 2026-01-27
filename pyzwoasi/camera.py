@@ -383,6 +383,12 @@ class ZWOCamera:
         # Software binning does not change latence or FPS in live view
         self.softwareBinning = 1
 
+        # Hardware binning, if available, may accelerate FPS
+        self.hardwareBinning = self.hardwareBinningLimits[1]
+
+        # High speed mode, if available, may accelerate FPS
+        self.highSpeedMode = True
+
         previousTime = time.time()
         self.startVideoCapture()
         while True:
