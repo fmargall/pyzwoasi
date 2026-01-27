@@ -264,7 +264,7 @@ class ZWOCamera:
         try:
             controlCaps = pyzwoasi.getControlCaps(self._cameraIndex, self._dictControlID["TargetTemp"])
             if controlCaps.IsWritable == False:
-                print("Target temperature writable for this camera.")
+                print("Target temperature not writable for this camera.")
                 return
 
             if self._dictControlMin["TargetTemp"] <= temperature <= self._dictControlMax["TargetTemp"]:
