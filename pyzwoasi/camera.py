@@ -54,6 +54,9 @@ class ZWOCamera:
             if controlName == "Image Type": self.imageType = controlCaps.DefaultValue
 
             # If the cooler can be controlled, it will always be set on
+            if (controlName == "CoolerOn") and controlCaps.IsWritable:
+                pyzwoasi.setControlValue(self._cameraIndex, self._dictControlType["CoolerOn"], True, auto=False)
+
     @property
     def imageType(self):
         _, _, _, imageType = pyzwoasi.getROIFormat(self._cameraIndex)
