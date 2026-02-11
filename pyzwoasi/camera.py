@@ -131,6 +131,14 @@ class ZWOCamera:
                           f"is [{self._dictControlMin['Gain']}, {self._dictControlMax['Gain']}].")
 
     @property
+    def gainLimits(self):
+        try:
+            return (self._dictControlMin["Gain"], self._dictControlMax["Gain"])
+        except KeyError:
+            print("Gain control not available for this camera.")
+            return (None, None)
+
+    @property
     def softwareBinning(self):
         _, _, binning, _ = pyzwoasi.getROIFormat(self._cameraIndex)
         return binning
