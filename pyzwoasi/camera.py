@@ -53,6 +53,9 @@ class ZWOCamera:
             if controlName == "Exposure"  : self.exposure  = controlCaps.DefaultValue
             if controlName == "Image Type": self.imageType = controlCaps.DefaultValue
 
+            # Initialize the gain to minimum value, for better safety.
+            if controlName == "Gain": self.gain = controlCaps.MinValue
+
             # If the cooler can be controlled, it will always be set on
             if (controlName == "CoolerOn") and controlCaps.IsWritable:
                 pyzwoasi.setControlValue(self._cameraIndex, self._dictControlType["CoolerOn"], True, auto=False)
