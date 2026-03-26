@@ -94,14 +94,14 @@ class ZWOCamera:
 
     @exposure.setter
     def exposure(self, exposureTime_us):
-        if self._dictControlMin["Exposure"] <= exposureTime_us <= self._dictControlMax["Exposure"]:
-            try:
+        try:
+            if self._dictControlMin["Exposure"] <= exposureTime_us <= self._dictControlMax["Exposure"]:
                 pyzwoasi.setControlValue(self._cameraIndex, self._dictControlType["Exposure"], exposureTime_us, auto=False)
-            except KeyError:
-                print("Exposure control not available for this camera.")
-        else:
-            raise ValueError(f"Exposure time out of range. Selected value is {exposureTime_us} and range "
-                           f"is [{self._dictControlMin['Exposure']}, {self._dictControlMax['Exposure']}].")
+            else:
+                raise ValueError(f"Exposure time out of range. Selected value is {exposureTime_us} and range "
+                               f"is [{self._dictControlMin['Exposure']}, {self._dictControlMax['Exposure']}].")
+        except KeyError:
+            print("Exposure control not available for this camera.")
 
     @property
     def exposureLimits(self):
@@ -121,14 +121,14 @@ class ZWOCamera:
 
     @gain.setter
     def gain(self, gainValue):
-        if self._dictControlMin["Gain"] <= gainValue <= self._dictControlMax["Gain"]:
-            try:
+        try:
+            if self._dictControlMin["Gain"] <= gainValue <= self._dictControlMax["Gain"]:
                 pyzwoasi.setControlValue(self._cameraIndex, self._dictControlType["Gain"], gainValue, auto=False)
-            except KeyError:
-                print("Gain control not available for this camera.")
-        else:
-            raise ValueError(f"Gain value out of range. Selected value is {gainValue} and range "
-                          f"is [{self._dictControlMin['Gain']}, {self._dictControlMax['Gain']}].")
+            else:
+                raise ValueError(f"Gain value out of range. Selected value is {gainValue} and range "
+                                 f"is [{self._dictControlMin['Gain']}, {self._dictControlMax['Gain']}].")
+        except KeyError:
+            print("Gain control not available for this camera.")
 
     @property
     def gainLimits(self):
@@ -161,8 +161,8 @@ class ZWOCamera:
 
     @hardwareBinning.setter
     def hardwareBinning(self, hardwareBinningArg):
-        if self._dictControlMin["HardwareBin"] <= hardwareBinningArg <= self._dictControlMax["HardwareBin"]:
-            try:
+        try:
+            if self._dictControlMin["HardwareBin"] <= hardwareBinningArg <= self._dictControlMax["HardwareBin"]:
                 controlCaps = pyzwoasi.getControlCaps(self._cameraIndex, self._dictControlID["HardwareBin"])
                 if controlCaps.IsWritable == False:
                     print("Hardware binning control not writable for this camera.")
@@ -170,11 +170,11 @@ class ZWOCamera:
 
                 pyzwoasi.setControlValue(self._cameraIndex, self._dictControlType["HardwareBin"], hardwareBinningArg, auto=False)
 
-            except KeyError:
-                print("Hardware binning control not available for this camera.")
-        else:
-            raise ValueError(f"Hardware binning value out of range. Selected value is {hardwareBinningArg} and range "
-                             f"is [{self._dictControlMin['HardwareBin']}, {self._dictControlMax['HardwareBin']}].")
+            else:
+                raise ValueError(f"Hardware binning value out of range. Selected value is {hardwareBinningArg} and range "
+                                 f"is [{self._dictControlMin['HardwareBin']}, {self._dictControlMax['HardwareBin']}].")
+        except KeyError:
+            print("Hardware binning control not available for this camera.")
 
     @property
     def hardwareBinningLimits(self):
