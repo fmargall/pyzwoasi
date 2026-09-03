@@ -56,7 +56,7 @@ def _checkWindowsDriver():
 _checkWindowsDriver()
 
 from .pyzwoasi import (
-    ASIError, ASIErrorCode, ASIExposureStatus,
+    ASIError, ASIErrorCode, ASIExposureStatus, ASIImageType,
     CameraInfo, ControlCaps, DateTime, GPSData, ID, SN,
     getNumOfConnectedCameras,
     getProductIDs,
