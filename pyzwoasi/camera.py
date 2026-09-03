@@ -227,6 +227,11 @@ class ZWOCamera:
         pyzwoasi.setROIFormat(self._cameraIndex, width, height, binning, imageType)
 
     @property
+    def size(self):
+        width, height, *_ = self.roi
+        return (width, height)
+
+    @property
     def highSpeedMode(self):
         try:
             return pyzwoasi.getControlValue(self._cameraIndex, self._dictControlType["HighSpeedMode"])[0]
@@ -377,7 +382,7 @@ class ZWOCamera:
 
         imageData = pyzwoasi.getDataAfterExp(self._cameraIndex, self.bufferSize)
 
-        shape = [height, width]
+        shape = self.size[::-1]
         if   self.imageType == ASIImageType.ASI_IMG_RAW8 or self.imageType == ASIImageType.ASI_IMG_Y8:
             img = np.frombuffer(imageData, dtype=np.uint8)
         elif self.imageType == ASIImageType.ASI_IMG_RAW16:
