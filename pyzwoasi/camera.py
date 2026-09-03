@@ -31,7 +31,6 @@ class ZWOCamera:
         self._isCoolerCam          = bool(cameraInfo.IsCoolerCam)
         self._isUSB3Host           = bool(cameraInfo.IsUSB3Host)
         self._isUSB3Camera         = bool(cameraInfo.IsUSB3Camera)
-        self._elecPerADU           = cameraInfo.ElecPerADU
         self._bitDepth             = cameraInfo.BitDepth
         self._isTriggerCam         = bool(cameraInfo.IsTriggerCam)
 
@@ -238,6 +237,12 @@ class ZWOCamera:
                               f"is [{self._dictControlMin['BandWidth']}, {self._dictControlMax['BandWidth']}].")
         except KeyError:
             print("Bandwidth control not available for this camera.")
+
+    @property
+    def elecPerADU(self):
+        cameraInfo = pyzwoasi.getCameraProperty(self._cameraIndex)
+        return cameraInfo.ElecPerADU
+
 
     """
     @brief Returns the current sensor temperature, in degrees Celsius.
