@@ -375,18 +375,7 @@ class ZWOCamera:
         # Stopping exposure and start conversion
         pyzwoasi.stopExposure(self._cameraIndex)
 
-        width, height, _, _ = pyzwoasi.getROIFormat(self._cameraIndex)
-        if   self.imageType == ASIImageType.ASI_IMG_RAW8 or self.imageType == ASIImageType.ASI_IMG_Y8:
-            bytesPerPixel = 1
-        elif self.imageType == ASIImageType.ASI_IMG_RAW16:
-            bytesPerPixel = 2
-        elif self.imageType == ASIImageType.ASI_IMG_RGB24:
-            bytesPerPixel = 3
-        else:
-            raise ValueError('Unsupported image type')
-        
-        bufferSize = width * height * bytesPerPixel
-        imageData = pyzwoasi.getDataAfterExp(self._cameraIndex, bufferSize)
+        imageData = pyzwoasi.getDataAfterExp(self._cameraIndex, self.bufferSize)
 
         shape = [height, width]
         if   self.imageType == ASIImageType.ASI_IMG_RAW8 or self.imageType == ASIImageType.ASI_IMG_Y8:
