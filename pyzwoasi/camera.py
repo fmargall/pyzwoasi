@@ -138,6 +138,33 @@ class ZWOCamera:
             return (None, None)
 
     @property
+    def offset(self):
+        try:
+            return pyzwoasi.getControlValue(self._cameraIndex, self._dictControlType["Offset"])[0]
+        except KeyError:
+            print("Offset control not available for this camera.")
+            return None
+
+    @offset.setter
+    def offset(self, offsetValue):
+        try:
+            if self._dictControlMin["Offset"] <= offsetValue <= self._dictControlMax["Offset"]:
+                pyzwoasi.setControlValue(self._cameraIndex, self._dictControlType["Offset"], offsetValue, auto=False)
+            else:
+                raise ValueError(f"Offset value out of range. Selected value is {offsetValue} and range "
+                                 f"is [{self._dictControlMin["Offset"]}, {self._dictControlMax["Offset"]}].")
+        except KeyError:
+            print("Offset control not available for this camera.")
+
+    @property
+    def offsetLimits(self):
+        try:
+            return (self._dictControlMin["Offset"], self._dictControlMax["Offset"])
+        except KeyError:
+            print("Offset control not available for this camera.")
+            return (None, None)
+
+    @property
     def softwareBinning(self):
         _, _, binning, _ = pyzwoasi.getROIFormat(self._cameraIndex)
         return binning
