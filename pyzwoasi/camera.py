@@ -151,8 +151,8 @@ class ZWOCamera:
             if self._dictControlMin["Offset"] <= offsetValue <= self._dictControlMax["Offset"]:
                 pyzwoasi.setControlValue(self._cameraIndex, self._dictControlType["Offset"], offsetValue, auto=False)
             else:
-                raise ValueError(f"Offset value out of range. Selected value is {offsetValue} and range "
-                                 f"is [{self._dictControlMin['Offset']}, {self._dictControlMax['Offset']}].")
+                raise ValueError(f"Offset value out of range. Selected value is {offsetValue} and range is"
+                                 f" [{self._dictControlMin['Offset']} ; {self._dictControlMax['Offset']}].")
         except KeyError:
             print("Offset control not available for this camera.")
 
