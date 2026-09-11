@@ -31,7 +31,6 @@ class ZWOCamera:
         self._isCoolerCam          = bool(cameraInfo.IsCoolerCam)
         self._isUSB3Host           = bool(cameraInfo.IsUSB3Host)
         self._isUSB3Camera         = bool(cameraInfo.IsUSB3Camera)
-        self._elecPerADU           = cameraInfo.ElecPerADU
         self._bitDepth             = cameraInfo.BitDepth
         self._isTriggerCam         = bool(cameraInfo.IsTriggerCam)
 
@@ -139,6 +138,33 @@ class ZWOCamera:
             return (None, None)
 
     @property
+    def offset(self):
+        try:
+            return pyzwoasi.getControlValue(self._cameraIndex, self._dictControlType["Offset"])[0]
+        except KeyError:
+            print("Offset control not available for this camera.")
+            return None
+
+    @offset.setter
+    def offset(self, offsetValue):
+        try:
+            if self._dictControlMin["Offset"] <= offsetValue <= self._dictControlMax["Offset"]:
+                pyzwoasi.setControlValue(self._cameraIndex, self._dictControlType["Offset"], offsetValue, auto=False)
+            else:
+                raise ValueError(f"Offset value out of range. Selected value is {offsetValue} and range "
+                                 f"is [{self._dictControlMin["Offset"]}, {self._dictControlMax["Offset"]}].")
+        except KeyError:
+            print("Offset control not available for this camera.")
+
+    @property
+    def offsetLimits(self):
+        try:
+            return (self._dictControlMin["Offset"], self._dictControlMax["Offset"])
+        except KeyError:
+            print("Offset control not available for this camera.")
+            return (None, None)
+
+    @property
     def softwareBinning(self):
         _, _, binning, _ = pyzwoasi.getROIFormat(self._cameraIndex)
         return binning
@@ -201,6 +227,11 @@ class ZWOCamera:
         pyzwoasi.setROIFormat(self._cameraIndex, width, height, binning, imageType)
 
     @property
+    def size(self):
+        width, height, *_ = self.roi
+        return (width, height)
+
+    @property
     def highSpeedMode(self):
         try:
             return pyzwoasi.getControlValue(self._cameraIndex, self._dictControlType["HighSpeedMode"])[0]
@@ -238,6 +269,12 @@ class ZWOCamera:
                               f"is [{self._dictControlMin['BandWidth']}, {self._dictControlMax['BandWidth']}].")
         except KeyError:
             print("Bandwidth control not available for this camera.")
+
+    @property
+    def elecPerADU(self):
+        cameraInfo = pyzwoasi.getCameraProperty(self._cameraIndex)
+        return cameraInfo.ElecPerADU
+
 
     """
     @brief Returns the current sensor temperature, in degrees Celsius.
@@ -343,20 +380,9 @@ class ZWOCamera:
         # Stopping exposure and start conversion
         pyzwoasi.stopExposure(self._cameraIndex)
 
-        width, height, _, _ = pyzwoasi.getROIFormat(self._cameraIndex)
-        if   self.imageType == ASIImageType.ASI_IMG_RAW8 or self.imageType == ASIImageType.ASI_IMG_Y8:
-            bytesPerPixel = 1
-        elif self.imageType == ASIImageType.ASI_IMG_RAW16:
-            bytesPerPixel = 2
-        elif self.imageType == ASIImageType.ASI_IMG_RGB24:
-            bytesPerPixel = 3
-        else:
-            raise ValueError('Unsupported image type')
-        
-        bufferSize = width * height * bytesPerPixel
-        imageData = pyzwoasi.getDataAfterExp(self._cameraIndex, bufferSize)
+        imageData = pyzwoasi.getDataAfterExp(self._cameraIndex, self.bufferSize)
 
-        shape = [height, width]
+        shape = self.size[::-1]
         if   self.imageType == ASIImageType.ASI_IMG_RAW8 or self.imageType == ASIImageType.ASI_IMG_Y8:
             img = np.frombuffer(imageData, dtype=np.uint8)
         elif self.imageType == ASIImageType.ASI_IMG_RAW16:
