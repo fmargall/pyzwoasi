@@ -152,7 +152,7 @@ class ZWOCamera:
                 pyzwoasi.setControlValue(self._cameraIndex, self._dictControlType["Offset"], offsetValue, auto=False)
             else:
                 raise ValueError(f"Offset value out of range. Selected value is {offsetValue} and range "
-                                 f"is [{self._dictControlMin["Offset"]}, {self._dictControlMax["Offset"]}].")
+                                 f"is [{self._dictControlMin['Offset']}, {self._dictControlMax['Offset']}].")
         except KeyError:
             print("Offset control not available for this camera.")
 
@@ -346,13 +346,13 @@ class ZWOCamera:
         # Setting exposure and image type
         if exposureTime_us is not None:
             self.exposure  = exposureTime_us
-        
+
         if imageType is not None:
             self.imageType = imageType
 
         # Let's start exposure
         pyzwoasi.startExposure(self._cameraIndex, True)
-        time.sleep(self.exposure / 1_000_000) # seconds 
+        time.sleep(self.exposure / 1_000_000) # seconds
 
         failedRuns = 0
         while  pyzwoasi.getExpStatus(self._cameraIndex) != ASIExposureStatus.ASI_EXP_SUCCESS:
@@ -370,7 +370,7 @@ class ZWOCamera:
                 pyzwoasi.stopExposure(self._cameraIndex)
 
                 pyzwoasi.startExposure(self._cameraIndex, True)
-                time.sleep(self.exposure / 1_000_000) # seconds  
+                time.sleep(self.exposure / 1_000_000) # seconds
 
         # Always check dropped frames before ending the capture
         droppedFrames = pyzwoasi.getDroppedFrames(self._cameraIndex)
@@ -390,7 +390,7 @@ class ZWOCamera:
         elif self.imageType == ASIImageType.ASI_IMG_RGB24:
             img = np.frombuffer(imageData, dtype=np.uint8)
             shape.append(3)
-        
+
         img  = img.reshape(shape)
         return img
 
@@ -462,7 +462,7 @@ class ZWOCamera:
             except ASIError as e:
                 print(f"Error getting video data: {e}")
                 continue
-                
+
             img = np.frombuffer(frame, dtype=np.uint8).reshape(height, width, 1)
 
             target_height = 480
