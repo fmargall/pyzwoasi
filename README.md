@@ -87,6 +87,28 @@ for cameraIndex in range(numOfConnectedCameras):
         camera.liveView()
 ```
 
+## Common Issues
+
+### `ASI_ERROR_CAMERA_REMOVED` During First Run
+
+When running on linux as a non-root user, the zwo camera may not be accessible.
+
+This is fixed by adding a rule file to the udev rules folder `/etc/udev/rules.d/`
+
+Create `asi.rules` in the udev rules folder and add:
+
+```
+SUBSYSTEM=="usb", ATTR{idVendor}=="03c3", MODE="0666"
+```
+
+To reload the rules run:
+
+```
+sudo udevadm control --reload-rules && sudo udevadm trigger
+```
+
+Then unplug and re-plug the camera.
+
 ## Advanced usage
 
 ### High-level access (ZWOCamera class)
