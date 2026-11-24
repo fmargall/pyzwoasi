@@ -53,6 +53,18 @@ cd pyzwoasi
 pip install -e .
 ```
 
+### Using another copy of ZWO's library
+
+PyZWOASI loads the ZWO ASI camera library bundled with the package. To load a different copy
+instead, for example a newer SDK release downloaded from ZWO, set the `PYZWOASI_LIBRARY`
+environment variable to the library's full path before importing the module:
+
+```bash
+export PYZWOASI_LIBRARY=/path/to/ASI_linux_mac_SDK/lib/x64/libASICamera2.so
+```
+
+If the variable is set but the file does not exist, importing `pyzwoasi` raises `FileNotFoundError`.
+
 ## Quick start
 
 ### First shot
