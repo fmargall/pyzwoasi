@@ -5,9 +5,15 @@ import os
 
 
 # Chosing and reading correct dll
+# Setting the PYZWOASI_LIBRARY environment variable to the full path of a ZWO ASI camera
+# library loads that file instead of the bundled one (e.g. a newer SDK release from ZWO).
 system = platform.system()
 arch = platform.architecture()[0]
-if   system == 'Windows':
+dllPath = os.environ.get('PYZWOASI_LIBRARY')
+if dllPath:
+    if not os.path.isfile(dllPath):
+        raise FileNotFoundError("PYZWOASI_LIBRARY is set, but the file does not exist: " + dllPath)
+elif system == 'Windows':
     dllPath = os.path.join(os.path.dirname(__file__), 'lib', system, 'x64' if arch == '64bit' else 'x86', 'ASICamera2.dll')
 elif system == 'Linux':
     dllPath = os.path.join(os.path.dirname(__file__), 'lib', system, 'x64' if arch == '64bit' else 'x86', 'libASICamera2.so.1.41')
